@@ -1,4 +1,12 @@
 cmake_minimum_required (VERSION 2.6)
 project (wRssSyn)
-add_executable (wRssSyn main.cpp)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(LibXML++ REQUIRED)
+include_directories(${LibXML++_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${LibXML++_LIBRARIES})
+
+add_executable (wRssSyn main.cpp rss2parser.cpp entry.cpp)
+target_link_libraries(wRssSyn ${LIBS})
 
