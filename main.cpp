@@ -1,6 +1,5 @@
-#include <libxml++/libxml++.h>
-#include <libxml++/parsers/textreader.h>
 #include <iostream>
+#include <fstream>
 #include "rss2parser.h"
 
 using namespace std;
