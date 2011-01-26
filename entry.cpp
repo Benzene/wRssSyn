@@ -19,3 +19,8 @@ Entry::print() {
   cout << "Date : " << date << endl;
   cout << "Description : " << description << endl;
 }
+
+void
+Entry::print_title() {
+  cout << "Title : " << title << endl;
+}

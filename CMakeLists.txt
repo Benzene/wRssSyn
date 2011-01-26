@@ -7,6 +7,10 @@ find_package(LibXML++ REQUIRED)
 include_directories(${LibXML++_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${CURL_LIBRARIES})
+
 add_executable (wRssSyn main.cpp rss2parser.cpp entry.cpp)
 target_link_libraries(wRssSyn ${LIBS})
 

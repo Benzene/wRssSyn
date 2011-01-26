@@ -15,12 +15,12 @@ RssParser::~RssParser() {
 
 void
 RssParser::on_start_document() {
-  std::cout << "on_start_document()" << endl;
+//  std::cout << "on_start_document()" << endl;
 }
 
 void
 RssParser::on_end_document() {
-  std::cout << "on_end_document()" << endl; 
+//  std::cout << "on_end_document()" << endl; 
   std::cout << "Feed Properties : " << endl;
   std::cout << "Title : " << GlobTitle << endl;
   std::cout << "Url : " << GlobUrl << endl;
@@ -56,7 +56,7 @@ RssParser::on_end_element(const Glib::ustring& name) {
   */
   if (name == "item") {
     
-    CurrentEntry->print();
+    CurrentEntry->print_title();
     delete CurrentEntry;
     
     in_entry = false;

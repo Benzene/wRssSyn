@@ -13,6 +13,7 @@ class Entry {
     Entry();
     ~Entry();
     void print();
+    void print_title();
   
 };
 
