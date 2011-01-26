@@ -1,5 +1,7 @@
 *~
 *.o
+*.xml
+*.core
 wRssSyn
 CMakeCache.txt
 CMakeFiles
