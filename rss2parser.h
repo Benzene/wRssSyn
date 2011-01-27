@@ -2,12 +2,14 @@
 #define MR_0710_RSS2PARSER
 
 #include <libxml++/libxml++.h>
+#include <sqlite3.h>
 #include "entry.h"
 
 class RssParser : public xmlpp::SaxParser
 {
   public:
     RssParser();
+    RssParser(sqlite3 * db, std::string id);
     virtual ~RssParser();
     
   protected:
@@ -31,6 +33,9 @@ class RssParser : public xmlpp::SaxParser
     Glib::ustring GlobTitle;
     Glib::ustring GlobUrl;
     Glib::ustring GlobDescr;
+    
+    sqlite3 * db;
+    std::string id;
 };
 
 #endif

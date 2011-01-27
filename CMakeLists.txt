@@ -11,6 +11,10 @@ find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${CURL_LIBRARIES})
 
+find_package(Sqlite3 REQUIRED)
+include_directories(${SQLITE3_INCLUDE_DIR})
+set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
+
 add_executable (wRssSyn main.cpp rss2parser.cpp entry.cpp)
 target_link_libraries(wRssSyn ${LIBS})
 

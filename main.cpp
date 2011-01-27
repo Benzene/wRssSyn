@@ -2,11 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <curl/curl.h>
+#include <sqlite3.h>
 #include "rss2parser.h"
 
 using namespace std;
 
 static char errorBuffer[CURL_ERROR_SIZE];
+
+sqlite3 * init_database();
 
 int main (int argc, char* argv[]) {
   
@@ -14,6 +17,9 @@ int main (int argc, char* argv[]) {
   std::locale::global(std::locale(""));
   
   ifstream fin("feedList.ini");
+  
+  /* Initialise database connection */
+  sqlite3 * db = init_database();
   
   /*
    * For each url in feedList.ini :
@@ -46,9 +52,10 @@ int main (int argc, char* argv[]) {
       curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, target);
       
-      
-      if(!curl_easy_perform(curl)) {
-	cout << errorBuffer << endl; 
+      result = curl_easy_perform(curl);
+      if(result != 0) {
+	cout << "Connection error : " << errorBuffer << endl; 
+	return 3;
       }
       
       curl_easy_cleanup(curl);
@@ -56,7 +63,7 @@ int main (int argc, char* argv[]) {
     
     fclose(target);
     
-    RssParser parser;
+    RssParser parser(db, id);
 //    parser.set_substitute_entities(true); // ?
     parser.parse_file(id + ".auto.xml");
 
@@ -69,3 +76,25 @@ int main (int argc, char* argv[]) {
   
 }
 
+/*
+ * Open the connection and create the tables if they don't already exist.
+ */
+sqlite3 * 
+init_database() {
+  sqlite3 * db;
+  string dbName = "feeds.db";
+  sqlite3_open_v2(dbName.c_str(), &db, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,NULL);
+  
+  string query("CREATE TABLE IF NOT EXISTS posts (website_id TEXT, id TEXT, title TEXT, link TEXT, date TEXT, description TEXT, PRIMARY KEY (website_id, id))");
+  sqlite3_stmt * sq_stmt;
+  sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
+  sqlite3_step(sq_stmt);
+  sqlite3_finalize(sq_stmt);
+  
+  string query2("CREATE TABLE IF NOT EXISTS sources (website_id TEXT PRIMARY KEY, title TEXT, url TEXT, descr TEXT)");
+  sqlite3_prepare_v2(db, query2.c_str(), -1, &sq_stmt, NULL);
+  sqlite3_step(sq_stmt);
+  sqlite3_finalize(sq_stmt);
+  
+  return db;
+}

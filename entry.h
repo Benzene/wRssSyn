@@ -1,6 +1,9 @@
 #ifndef MR_0710_ENTRY
 #define MR_0710_ENTRY
 
+#include <sqlite3.h>
+#include <string>
+
 class Entry {
   
   public:
@@ -14,6 +17,7 @@ class Entry {
     ~Entry();
     void print();
     void print_title();
+    void write_to_db(sqlite3 * db, std::string website_id);
   
 };
 

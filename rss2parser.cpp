@@ -9,38 +9,59 @@ RssParser::RssParser() : xmlpp::SaxParser() {
     in_entry = false;
 }
 
+RssParser::RssParser(sqlite3 * db, string id) : xmlpp::SaxParser() {
+    in_entry = false;
+    this->db = db;
+    this->id = id;
+}
+
 RssParser::~RssParser() {
-  
+    
 }
 
 void
 RssParser::on_start_document() {
-//  std::cout << "on_start_document()" << endl;
 }
 
 void
 RssParser::on_end_document() {
-//  std::cout << "on_end_document()" << endl; 
   std::cout << "Feed Properties : " << endl;
   std::cout << "Title : " << GlobTitle << endl;
   std::cout << "Url : " << GlobUrl << endl;
   std::cout << "Description : " << GlobDescr << endl;
+
+  int retcode = 0;
+  
+  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?)");
+  sqlite3_stmt * sq_stmt;
+  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_prepare_v2 failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,1,id.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(1) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,2,GlobTitle.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(2) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,3,GlobUrl.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(3) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,4,GlobDescr.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_step(sq_stmt);
+  sqlite3_finalize(sq_stmt);
+
 }
 
 void
 RssParser::on_start_element(const Glib::ustring& name,
-			    const AttributeList& attributes) {
-
-  /* 
-  std::cout << "node name=" << name << endl;
-  for (xmlpp::SaxParser::AttributeList::const_iterator iter = attributes.begin();
-       iter != attributes.end();
-       ++iter) {
-    std::cout << "  Attribute name=" << iter->name << std::endl;
-    std::cout << "    , value=" << iter->value << std::endl;
-  }
-  */
-  
+			    const AttributeList& attributes) {  
   CurrentTag = name;
   
   if (name == "item") {
@@ -51,12 +72,10 @@ RssParser::on_start_element(const Glib::ustring& name,
 
 void
 RssParser::on_end_element(const Glib::ustring& name) {
-  /*
-  std::cout << "on_end_element(" << name << ")" << endl;
-  */
   if (name == "item") {
     
     CurrentEntry->print_title();
+    CurrentEntry->write_to_db(db, id);
     delete CurrentEntry;
     
     in_entry = false;
@@ -65,9 +84,6 @@ RssParser::on_end_element(const Glib::ustring& name) {
 
 void
 RssParser::on_characters(const Glib::ustring& text) {
-  /*
-  std::cout << "Text : " << text << endl;
-  */
   
   if (CurrentTag == "title") {
     if (!in_entry) {
