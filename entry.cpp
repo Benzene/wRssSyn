@@ -7,6 +7,14 @@ Entry::Entry() {
   
 }
 
+Entry::Entry(string id, string title, string link, string date, string description) {
+  this->id = id;
+  this->title = title;
+  this->link = link;
+  this->date = date;
+  this->description = description;
+}
+
 Entry::~Entry() {
   
 }
