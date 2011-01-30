@@ -1,0 +1,7 @@
+
+A very simple RSS reader.
+
+Reads urls from a feedList.ini file (example one provided).
+Can fetch the rss files, parse them, and store the articles in a sqlite database.
+
+Just run wRssSyn without arguments for a simple help.
