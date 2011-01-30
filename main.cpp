@@ -13,7 +13,7 @@ static char errorBuffer[CURL_ERROR_SIZE];
 sqlite3 * init_database();
 int update_feeds();
 int get_feed(string id);
-int list_feeds() {}
+int list_feeds();
 int add_feed(string url) {}
 
 void print_usage();
@@ -163,7 +163,27 @@ get_feed(string id) {
   return 0;
 }
 
+int list_feeds() {
+  
+  sqlite3 * db = init_database();
+  sqlite3_stmt * sq_stmt;
+  int retcode = 0;
+  
+  string query("SELECT * FROM sources");
+  
+  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
 
+  while ( sqlite3_step(sq_stmt) == SQLITE_ROW) {
+    cout << " * " << (char *)sqlite3_column_text(sq_stmt,0);
+    cout << ": " << (char *)sqlite3_column_text(sq_stmt,1);
+    cout << " (" << (char *)sqlite3_column_text(sq_stmt,2);
+    cout << ")" << endl;
+  }
+    
+  sqlite3_finalize(sq_stmt);
+  
+  return 0;
+}
 
 /*
  * Open the connection and create the tables if they don't already exist.
