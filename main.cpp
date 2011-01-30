@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <ctime>
 #include <curl/curl.h>
 #include <sqlite3.h>
 #include "rss2parser.h"
@@ -18,7 +19,8 @@ int add_feed(string url) {}
 void print_usage();
 
 
-int main (int argc, char* argv[]) {
+int
+main (int argc, char* argv[]) {
   
   // Supposed to make the encoding right..
   std::locale::global(std::locale(""));
@@ -58,7 +60,8 @@ int main (int argc, char* argv[]) {
   return 0;
 }
 
-void print_usage() {
+void
+print_usage() {
     cerr << "Usage : wRssSyn <command>" << endl;
     cerr << "With <command> is one of : " << endl;
     cerr << "  update 		updates the feeds" << endl;
@@ -67,7 +70,8 @@ void print_usage() {
     cerr << "  add [url]	adds an rss url to the list" << endl; 
 }
 
-int update_feeds() {
+int
+update_feeds() {
   
   ifstream fin("feedList.ini");
   
@@ -126,7 +130,8 @@ int update_feeds() {
   
 }
 
-int get_feed(string id) {
+int
+get_feed(string id) {
   sqlite3 * db = init_database();
   sqlite3_stmt * sq_stmt;
   int retcode = 0;
@@ -146,7 +151,7 @@ int get_feed(string id) {
     string id((char *)sqlite3_column_text(sq_stmt,1));
     string title((char *)sqlite3_column_text(sq_stmt,2));
     string link((char *)sqlite3_column_text(sq_stmt,3));
-    string date((char *)sqlite3_column_text(sq_stmt,4));
+    time_t date = sqlite3_column_int(sq_stmt,4);
     string description((char *)sqlite3_column_text(sq_stmt,5));
     Entry e(id, title, link, date, description);
     
@@ -169,7 +174,7 @@ init_database() {
   string dbName = "feeds.db";
   sqlite3_open_v2(dbName.c_str(), &db, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,NULL);
   
-  string query("CREATE TABLE IF NOT EXISTS posts (website_id TEXT, id TEXT, title TEXT, link TEXT, date TEXT, description TEXT, PRIMARY KEY (website_id, id))");
+  string query("CREATE TABLE IF NOT EXISTS posts (website_id TEXT, id TEXT, title TEXT, link TEXT, date INTEGER, description TEXT, PRIMARY KEY (website_id, id))");
   sqlite3_stmt * sq_stmt;
   sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   sqlite3_step(sq_stmt);

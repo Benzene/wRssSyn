@@ -21,10 +21,16 @@ RssParser::~RssParser() {
 
 void
 RssParser::on_start_document() {
+
+//  cout << "on_start_document()" << endl;
+  
 }
 
 void
 RssParser::on_end_document() {
+  
+//  cout << "on_end_document()" << endl;
+  
   std::cout << "Feed Properties : " << endl;
   std::cout << "Title : " << GlobTitle << endl;
   std::cout << "Url : " << GlobUrl << endl;
@@ -62,6 +68,9 @@ RssParser::on_end_document() {
 void
 RssParser::on_start_element(const Glib::ustring& name,
 			    const AttributeList& attributes) {  
+
+//  cout << "on_start_element(" << name << ")" << endl;
+  
   CurrentTag = name;
   
   if (name == "item") {
@@ -72,6 +81,9 @@ RssParser::on_start_element(const Glib::ustring& name,
 
 void
 RssParser::on_end_element(const Glib::ustring& name) {
+  
+//  cout << "on_end_element(" << name << ")" << endl;
+  
   if (name == "item") {
     
     CurrentEntry->print_title();
@@ -84,6 +96,8 @@ RssParser::on_end_element(const Glib::ustring& name) {
 
 void
 RssParser::on_characters(const Glib::ustring& text) {
+  
+//  cout << "on_characters(" << text << ")" << endl;
   
   if (CurrentTag == "title") {
     if (!in_entry) {

@@ -15,6 +15,8 @@ find_package(Sqlite3 REQUIRED)
 include_directories(${SQLITE3_INCLUDE_DIR})
 set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
-add_executable (wRssSyn main.cpp rss2parser.cpp entry.cpp)
+set(CMAKE_BUILD_TYPE Debug)
+
+add_executable (wRssSyn main.cpp rss2parser.cpp entry.cpp time_helpers.cpp)
 target_link_libraries(wRssSyn ${LIBS})
 

@@ -1,5 +1,9 @@
 #include <iostream>
+#include <cstdlib>
 #include "entry.h"
+
+#include "time_helpers.h"
+
 
 using namespace std;
 
@@ -7,11 +11,12 @@ Entry::Entry() {
   
 }
 
-Entry::Entry(string id, string title, string link, string date, string description) {
+Entry::Entry(string id, string title, string link, time_t date, string description) {
   this->id = id;
   this->title = title;
   this->link = link;
-  this->date = date;
+  string strdate(asctime(localtime(&date)));
+  this->date = strdate;
   this->description = description;
 }
 
@@ -67,11 +72,15 @@ Entry::write_to_db(sqlite3 * db, std::string website_id) {
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
   }
+
+//  cout << "Parsing date : " << date << endl;
+  time_t ret = TimeHelpers::parseXMLtime(date);
+//  cout << "parseXMLtime() returned : " << ret << endl;
   
-  retcode = sqlite3_bind_text(sq_stmt,5,date.c_str(),-1,SQLITE_STATIC);
+  retcode = sqlite3_bind_int(sq_stmt,5,ret);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(5) failed ! Retcode : " << retcode << endl;
-  }
+  }  
   
   retcode = sqlite3_bind_text(sq_stmt,6,description.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
@@ -80,6 +89,5 @@ Entry::write_to_db(sqlite3 * db, std::string website_id) {
   
   sqlite3_step(sq_stmt);
   sqlite3_finalize(sq_stmt);
-  
-  
+    
 }

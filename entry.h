@@ -3,6 +3,7 @@
 
 #include <sqlite3.h>
 #include <string>
+#include <ctime>
 
 class Entry {
   
@@ -15,7 +16,7 @@ class Entry {
     
     Entry();
     Entry(std::string id, std::string title, 
-	  std::string link, std::string date, 
+	  std::string link, time_t date, 
 	  std::string description);
     ~Entry();
     void print();
