@@ -14,7 +14,7 @@ sqlite3 * init_database();
 int update_feeds();
 int get_feed(string id);
 int list_feeds();
-int add_feed(string url) {}
+int add_feed(string name, string url);
 
 void print_usage();
 
@@ -43,12 +43,13 @@ main (int argc, char* argv[]) {
     } else if ( cmd == "list") {
       return list_feeds();
     } else if ( cmd == "add") {
-      if (argc < 3) {
+      if (argc < 4) {
 	print_usage();
 	return 1;
       } else {
-	string url(argv[2]);
-	return add_feed(url);
+	string name(argv[2]);
+	string url(argv[3]);
+	return add_feed(name,url);
       }
     } else {
       print_usage();
@@ -67,7 +68,7 @@ print_usage() {
     cerr << "  update 		updates the feeds" << endl;
     cerr << "  get [feed_id]	prints last entries for feed [feed_id]" << endl;
     cerr << "  list		prints the list of feeds currently registered" << endl;
-    cerr << "  add [url]	adds an rss url to the list" << endl; 
+    cerr << "  add [name] [url]	adds an rss url to the list" << endl; 
 }
 
 int
@@ -184,6 +185,16 @@ int list_feeds() {
   
   return 0;
 }
+
+int add_feed(string name, string url) {
+
+  ofstream fout("feedList.ini", ios_base::app);
+  
+  fout << url << " " << name << endl;
+  
+  return 0;
+}
+
 
 /*
  * Open the connection and create the tables if they don't already exist.
