@@ -211,7 +211,7 @@ init_database() {
   sqlite3_step(sq_stmt);
   sqlite3_finalize(sq_stmt);
   
-  string query2("CREATE TABLE IF NOT EXISTS sources (website_id TEXT PRIMARY KEY, title TEXT, url TEXT, descr TEXT)");
+  string query2("CREATE TABLE IF NOT EXISTS sources (website_id TEXT PRIMARY KEY, title TEXT, url TEXT, descr TEXT, imgtitle TEXT, imgurl TEXT, imglink TEXT)");
   sqlite3_prepare_v2(db, query2.c_str(), -1, &sq_stmt, NULL);
   sqlite3_step(sq_stmt);
   sqlite3_finalize(sq_stmt);

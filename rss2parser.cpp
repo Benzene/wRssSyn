@@ -7,12 +7,14 @@ using namespace std;
 
 RssParser::RssParser() : xmlpp::SaxParser() {
     in_entry = false;
+    header_image = false;
 }
 
 RssParser::RssParser(sqlite3 * db, string id) : xmlpp::SaxParser() {
     in_entry = false;
     this->db = db;
     this->id = id;
+    header_image = false;
 }
 
 RssParser::~RssParser() {
@@ -38,7 +40,7 @@ RssParser::on_end_document() {
 
   int retcode = 0;
   
-  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?)");
+  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?,?,?,?)");
   sqlite3_stmt * sq_stmt;
   retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   if (retcode != SQLITE_OK) {
@@ -60,6 +62,18 @@ RssParser::on_end_document() {
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
   }
+  sqlite3_bind_text(sq_stmt,5,ImgTitle.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,6,ImgUrl.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,7,ImgLink.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+  }
   sqlite3_step(sq_stmt);
   sqlite3_finalize(sq_stmt);
 
@@ -76,6 +90,8 @@ RssParser::on_start_element(const Glib::ustring& name,
   if (name == "item") {
     in_entry = true;
     CurrentEntry = new Entry();
+  } else if (!in_entry && name == "image") {
+    header_image = true;
   }
 }
 
@@ -83,6 +99,8 @@ void
 RssParser::on_end_element(const Glib::ustring& name) {
   
 //  cout << "on_end_element(" << name << ")" << endl;
+
+  CurrentTag = "";
   
   if (name == "item") {
     
@@ -91,6 +109,8 @@ RssParser::on_end_element(const Glib::ustring& name) {
     delete CurrentEntry;
     
     in_entry = false;
+  } else if (!in_entry && name == "image") {
+    header_image = false;
   }
 }
 
@@ -99,30 +119,36 @@ RssParser::on_characters(const Glib::ustring& text) {
   
 //  cout << "on_characters(" << text << ")" << endl;
   
-  if (CurrentTag == "title") {
-    if (!in_entry) {
+  if (!in_entry && !header_image) {
+    if (CurrentTag == "title") {
       GlobTitle += text;
-    } else {
-      CurrentEntry->title += text;
-    }
-  } else if (CurrentTag == "link") {
-    if (!in_entry) {
+    } else if (CurrentTag == "link") {
       GlobUrl += text;
-    } else {
-      CurrentEntry->link += text;
-    }
-  } else if (CurrentTag == "description") {
-    if (!in_entry) {
+    } else if (CurrentTag == "description") {
       GlobDescr += text;
-    } else {
+    }
+  }
+  
+  if (!in_entry && header_image) {
+    if (CurrentTag == "title") {
+      ImgTitle += text;
+    } else if (CurrentTag == "url") {
+      ImgUrl += text;
+    } else if (CurrentTag == "link") {
+      ImgLink +=text;
+    }
+  }
+  
+  if (in_entry) {
+    if (CurrentTag == "title") {
+      CurrentEntry->title += text;
+    } else if (CurrentTag == "link") {
+      CurrentEntry->link += text;
+    } else if (CurrentTag == "description") {
       CurrentEntry->description += text;
-    }
-  } else if (CurrentTag == "pubDate") {
-    if (in_entry) {
+    } else if (CurrentTag == "pubDate") {
       CurrentEntry->date += text;
-    }
-  } else if (CurrentTag == "guid") {
-    if (in_entry) {
+    } else if (CurrentTag == "guid") {
       CurrentEntry->id += text;
     }
   }

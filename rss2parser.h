@@ -26,6 +26,7 @@ class RssParser : public xmlpp::SaxParser
     
   private:
     bool in_entry;
+    bool header_image;
     Glib::ustring CurrentTag;
     
     Entry * CurrentEntry;
@@ -33,6 +34,9 @@ class RssParser : public xmlpp::SaxParser
     Glib::ustring GlobTitle;
     Glib::ustring GlobUrl;
     Glib::ustring GlobDescr;
+    Glib::ustring ImgTitle;
+    Glib::ustring ImgUrl;
+    Glib::ustring ImgLink;
     
     sqlite3 * db;
     std::string id;
