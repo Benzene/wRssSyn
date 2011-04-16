@@ -33,6 +33,7 @@ RssParser::on_end_document() {
   
 //  cout << "on_end_document()" << endl;
   
+  try {
   std::cout << "Feed Properties : " << endl;
   std::cout << "Title : " << GlobTitle << endl;
   std::cout << "Url : " << GlobUrl << endl;
@@ -77,6 +78,14 @@ RssParser::on_end_document() {
   sqlite3_step(sq_stmt);
   sqlite3_finalize(sq_stmt);
 
+  // TODO: Check that this doesn't do weird things
+  // the feed properties aren't added while the content is still parsed
+  // => clutters the database, and these entries might appear for different
+  // feeds
+  } catch (Glib::ConvertError) {
+    std::cout << "Parsing error. Could not parse the feed" << endl;
+  }
+
 }
 
 void
@@ -116,6 +125,8 @@ RssParser::on_end_element(const Glib::ustring& name) {
 
 void
 RssParser::on_characters(const Glib::ustring& text) {
+
+  try {
   
 //  cout << "on_characters(" << text << ")" << endl;
   
@@ -153,6 +164,9 @@ RssParser::on_characters(const Glib::ustring& text) {
     }
   }
     
+  } catch (Glib::ConvertError) {
+    std::cout << "Parsing error." << endl;
+  }  
 }
 
 void
