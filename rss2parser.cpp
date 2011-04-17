@@ -34,10 +34,10 @@ RssParser::on_end_document() {
 //  cout << "on_end_document()" << endl;
   
   try {
-  std::cout << "Feed Properties : " << endl;
-  std::cout << "Title : " << GlobTitle << endl;
-  std::cout << "Url : " << GlobUrl << endl;
-  std::cout << "Description : " << GlobDescr << endl;
+//  std::cout << "Feed Properties : " << endl;
+//  std::cout << "Title : " << GlobTitle << endl;
+//  std::cout << "Url : " << GlobUrl << endl;
+//  std::cout << "Description : " << GlobDescr << endl;
 
   int retcode = 0;
   
@@ -113,7 +113,7 @@ RssParser::on_end_element(const Glib::ustring& name) {
   
   if (name == "item") {
     
-    CurrentEntry->print_title();
+//    CurrentEntry->print_title();
     CurrentEntry->write_to_db(db, id);
     delete CurrentEntry;
     
@@ -171,7 +171,7 @@ RssParser::on_characters(const Glib::ustring& text) {
 
 void
 RssParser::on_comment(const Glib::ustring& text) {
-  std::cout << "Comments : " << text << endl;
+//  std::cout << "Comments : " << text << endl;
 }
 
 void

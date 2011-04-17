@@ -94,7 +94,7 @@ update_feeds() {
     if (fin.eof()) {
       break;
     }
-    cout << id << " : " << url << endl;
+    cout << "Updating " << id << " (" << url << ")" << endl;
 
     FILE * target = fopen ( (id+".auto.xml").c_str(), "w");
     
@@ -122,7 +122,8 @@ update_feeds() {
     fclose(target);
     
     RssParser parser(db, id);
-//    parser.set_substitute_entities(true); // ?
+    // Convert html entities to normal characters
+    parser.set_substitute_entities(true);
     parser.parse_file(id + ".auto.xml");
 
   }
