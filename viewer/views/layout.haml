@@ -23,9 +23,16 @@
         .linebreak {
           clear: both;
         }
-        a {
-          text-decoration: none;
+        a, a:visited {
+          text-decoration: none; color: black;
+        }
+        #header {
+          heigth: 30px;
+          border: 1px solid;
         }
   %body
+    #header
+      %a{:href => "/"}
+        wRssSyn : a simple rss syndicator
     = yield
     

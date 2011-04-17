@@ -42,7 +42,7 @@ void
 Entry::write_to_db(sqlite3 * db, std::string website_id) {
   int retcode = 0;
   
-  string query("INSERT OR IGNORE INTO posts VALUES (?,?,?,?,?,?)");
+  string query("INSERT OR IGNORE INTO posts VALUES (?,?,?,?,?,?,0)");
   sqlite3_stmt * sq_stmt;
   retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   if (retcode != SQLITE_OK) {

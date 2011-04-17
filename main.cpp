@@ -206,7 +206,7 @@ init_database() {
   string dbName = "feeds.db";
   sqlite3_open_v2(dbName.c_str(), &db, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,NULL);
   
-  string query("CREATE TABLE IF NOT EXISTS posts (website_id TEXT, id TEXT, title TEXT, link TEXT, date INTEGER, description TEXT, PRIMARY KEY (website_id, id))");
+  string query("CREATE TABLE IF NOT EXISTS posts (website_id TEXT, id TEXT, title TEXT, link TEXT, date INTEGER, description TEXT, read INTEGER, PRIMARY KEY (website_id, id))");
   sqlite3_stmt * sq_stmt;
   sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   sqlite3_step(sq_stmt);

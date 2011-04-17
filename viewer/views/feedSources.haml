@@ -1,5 +1,14 @@
 - @sources.each do |source|
-  %img{:src => "#{source[5]}", :alt => "#{source[4]}"}
   %a{:href => "#{source[0]}"}
-    = source[1]
+    &gt; #{source[1]} 
+  (
+  %a{:href => "#{source[2]}"}
+    #{source[2]}
+  ) : #{source[3]}
+  %a{:href => "new/#{source[0]}"}
+    - if source[8] != nil
+      %strong
+        (#{source[8]} new posts)
+    - else
+      (No new posts)  	
   %br
