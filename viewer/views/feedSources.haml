@@ -1,0 +1,5 @@
+- @sources.each do |source|
+  %img{:src => "#{source[5]}", :alt => "#{source[4]}"}
+  %a{:href => "#{source[0]}"}
+    = source[1]
+  %br
