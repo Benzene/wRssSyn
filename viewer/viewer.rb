@@ -13,7 +13,7 @@ end
 
 get '/new/:feed' do
   pair = [ params[:feed] ]
-  @posts = @db.execute ("select * from posts where website_id=? and read='0' order by date desc limit 10"), pair
+  @posts = @db.execute ("select * from posts where website_id=? and read='0' order by date desc"), pair
   @db.execute ("update posts set read=1 where website_id=? and read=0"), pair
   haml :posts
 end  
