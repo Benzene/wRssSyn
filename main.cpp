@@ -7,6 +7,8 @@
 #include "rss2parser.h"
 #include "atomparser.h"
 #include "rssatomdecider.h"
+#include "tumblr.h"
+#include "tumblrparser.h"
 
 using namespace std;
 
@@ -141,6 +143,12 @@ update_feeds() {
     cout << " done" << endl;
 
   }
+
+  // Special case for tumblr dashboard
+  update_tumblr_feeds(db);
+  TumblrParser parser(db,"tumblrdashboard");
+  parser.set_substitute_entities(true);
+  parser.parse_file("tumblrdashboard.auto.xml");
   
   return 0;
   
