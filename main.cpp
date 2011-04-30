@@ -5,6 +5,8 @@
 #include <curl/curl.h>
 #include <sqlite3.h>
 #include "rss2parser.h"
+#include "atomparser.h"
+#include "rssatomdecider.h"
 
 using namespace std;
 
@@ -121,10 +123,22 @@ update_feeds() {
     
     fclose(target);
     
-    RssParser parser(db, id);
+    RssAtomDecider preparser;
     // Convert html entities to normal characters
-    parser.set_substitute_entities(true);
-    parser.parse_file(id + ".auto.xml");
+    preparser.set_substitute_entities(true);
+    preparser.parse_file(id + ".auto.xml");
+    if (preparser.is_rss2()) {
+      cout << "(Rss feed)";
+      RssParser parser(db, id);
+      parser.set_substitute_entities(true);
+      parser.parse_file(id + ".auto.xml");
+    } else if (preparser.is_atom()) {
+      cout << "(Atom feed)";
+      AtomParser parser(db,id);
+      parser.set_substitute_entities(true);
+      parser.parse_file(id + ".auto.xml");
+    }
+    cout << " done" << endl;
 
   }
   
