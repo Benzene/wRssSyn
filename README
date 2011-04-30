@@ -1,8 +1,12 @@
 
-A very simple RSS reader.
+A very simple RSS2/Atom reader.
 
 Reads urls from a feedList.ini file (example one provided).
 Can fetch the rss files, parse them, and store the articles in a sqlite database.
 
-Just run wRssSyn without arguments for a simple help.
+In addition, it can parse some specific feeds. Tumblr (dashboard) is supported for now. More coming soon.
+
+A simple viewer (based on the sinatra framework) is included. It provides a minimal application to view the feeds. It can be started via 'ruby viewer/viewer.rb', from the application's main directory.
+
+Run wRssSyn without arguments for a simple help.
 
