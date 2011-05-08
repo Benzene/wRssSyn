@@ -170,6 +170,11 @@ RssParser::on_characters(const Glib::ustring& text) {
 }
 
 void
+RssParser::on_cdata_block(const Glib::ustring& text) {
+	on_characters(text);
+}	
+
+void
 RssParser::on_comment(const Glib::ustring& text) {
 //  std::cout << "Comments : " << text << endl;
 }
