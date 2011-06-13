@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "entry.h"
 
+#include "auth.h"
 #include "time_helpers.h"
 
 
@@ -42,7 +43,7 @@ void
 Entry::write_to_db(sqlite3 * db, std::string website_id) {
   int retcode = 0;
   
-  string query("INSERT OR IGNORE INTO posts VALUES (?,?,?,?,?,?,0)");
+  string query("INSERT OR IGNORE INTO posts VALUES (?,?,?,?,?,?,0,?)");
   sqlite3_stmt * sq_stmt;
   retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   if (retcode != SQLITE_OK) {
@@ -83,6 +84,11 @@ Entry::write_to_db(sqlite3 * db, std::string website_id) {
   }  
   
   retcode = sqlite3_bind_text(sq_stmt,6,description.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(6) failed ! Retcode : " << retcode << endl;
+  }
+  
+  retcode = sqlite3_bind_text(sq_stmt,7,glob_login.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(6) failed ! Retcode : " << retcode << endl;
   }

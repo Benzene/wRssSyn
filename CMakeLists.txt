@@ -17,6 +17,6 @@ set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_executable (wRssSyn main.cpp rss2parser.cpp atomparser.cpp rssatomdecider.cpp tumblrparser.cpp tumblr.cpp tumblr_entry.cpp entry.cpp time_helpers.cpp)
+add_executable (wRssSyn main.cpp rss2parser.cpp atomparser.cpp rssatomdecider.cpp tumblrparser.cpp tumblr.cpp tumblr_entry.cpp entry.cpp time_helpers.cpp auth.cpp)
 target_link_libraries(wRssSyn ${LIBS})
 

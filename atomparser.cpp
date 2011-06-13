@@ -1,4 +1,5 @@
 #include "atomparser.h"
+#include "auth.h"
 #include <glibmm/convert.h> // For Glib::ConvertError
 
 #include <iostream>
@@ -41,7 +42,7 @@ AtomParser::on_end_document() {
 
   int retcode = 0;
   
-  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?,?,?,?)");
+  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?,?,?,?,?)");
   sqlite3_stmt * sq_stmt;
   retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   if (retcode != SQLITE_OK) {
@@ -72,6 +73,10 @@ AtomParser::on_end_document() {
     cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
   }
   sqlite3_bind_text(sq_stmt,7,ImgLink.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,8,glob_login.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
   }

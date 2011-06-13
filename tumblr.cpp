@@ -1,5 +1,5 @@
 #include "tumblr.h"
-#include "tumblr_auth.h"
+#include "auth.h"
 
 using namespace std;
 
