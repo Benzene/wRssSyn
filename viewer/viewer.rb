@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'rubygems'
 require 'sqlite3'
-require_relative 'loginHandler'
+require_relative 'login-commons/loginHandler'
 
 before do
 	@db = SQLite3::Database.new "../feeds.db"
