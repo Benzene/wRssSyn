@@ -42,43 +42,39 @@ RssParser::on_end_document() {
 
   int retcode = 0;
   
-  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?,?,?,?,?)");
+  string query("UPDATE sources SET title=?, url=?, descr=?, imgtitle=?, imgurl=?, imglink=? WHERE website_id=? LIMIT 1"); 
   sqlite3_stmt * sq_stmt;
   retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_prepare_v2 failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,1,id.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,1,GlobTitle.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(1) failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,2,GlobTitle.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,2,GlobUrl.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(2) failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,3,GlobUrl.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,3,GlobDescr.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(3) failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,4,GlobDescr.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,4,ImgTitle.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
     cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,5,ImgTitle.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,5,ImgUrl.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+    cout << "sqlite3_bind_text(5) failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,6,ImgUrl.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,6,ImgLink.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+    cout << "sqlite3_bind_text(6) failed ! Retcode : " << retcode << endl;
   }
-  sqlite3_bind_text(sq_stmt,7,ImgLink.c_str(),-1,SQLITE_STATIC);
+  sqlite3_bind_text(sq_stmt,7,id.c_str(),-1,SQLITE_STATIC);
   if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,8,glob_login.c_str(),-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
+    cout << "sqlite3_bind_text(7) failed ! Retcode : " << retcode << endl;
   }
   sqlite3_step(sq_stmt);
   sqlite3_finalize(sq_stmt);

@@ -11,10 +11,10 @@ TumblrParser::TumblrParser() : xmlpp::SaxParser() {
     header_image = false;
 }
 
-TumblrParser::TumblrParser(sqlite3 * db, string id) : xmlpp::SaxParser() {
+TumblrParser::TumblrParser(sqlite3 * db) : xmlpp::SaxParser() {
     in_entry = false;
     this->db = db;
-    this->id = id;
+    this->id = "tumblrdashboard";
     header_image = false;
 }
 
@@ -39,49 +39,6 @@ TumblrParser::on_end_document() {
 //  std::cout << "Title : " << GlobTitle << endl;
 //  std::cout << "Url : " << GlobUrl << endl;
 //  std::cout << "Description : " << GlobDescr << endl;
-
-  int retcode = 0;
-  
-  string query("INSERT OR IGNORE INTO sources VALUES (?,?,?,?,?,?,?,?)");
-  sqlite3_stmt * sq_stmt;
-  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_prepare_v2 failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,1,id.c_str(),-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(1) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,2,"Tumblr dashboard",-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(2) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,3,"http://www.tumblr.com/dashboard",-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(3) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,4,"Tumblr dashboard",-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,5,"",-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,6,"",-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,7,"",-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_bind_text(sq_stmt,8,glob_login.c_str(),-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(4) failed ! Retcode : " << retcode << endl;
-  }
-  sqlite3_step(sq_stmt);
-  sqlite3_finalize(sq_stmt);
 
   // TODO: Check that this doesn't do weird things
   // the feed properties aren't added while the content is still parsed

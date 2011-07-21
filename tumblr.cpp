@@ -17,6 +17,21 @@ update_tumblr_feeds(sqlite3 * db) {
    */
   cout << "Updating tumblr dashboard feed" << endl;
 
+  /* Make sure the infos are in the database. */
+  int retcode = 0;
+  string query("INSERT OR IGNORE INTO sources (website_id, feed_url, title, url, descr, imgtitle, imgurl, imglink, user, etag, lastmodified) VALUES ('tumblrdashboard','','Tumblr dashboard', 'http://www.tumblr.com/dashboard','Tumblr dashboard','','','',?,'','')");
+  sqlite3_stmt * sq_stmt;
+  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_prepare_v2 failed ! Retcode : " << retcode << endl;
+  }
+  sqlite3_bind_text(sq_stmt,1,glob_login.c_str(),-1,SQLITE_STATIC);
+  if (retcode != SQLITE_OK) {
+    cout << "sqlite3_bind_text(2) failed ! Retcode : " << retcode << endl;
+  }
+
+  sqlite3_step(sq_stmt);
+
   FILE * target = fopen ( "tumblrdashboard.auto.xml", "w");
     
   CURL *curl;

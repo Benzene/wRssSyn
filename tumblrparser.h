@@ -9,7 +9,7 @@ class TumblrParser : public xmlpp::SaxParser
 {
   public:
     TumblrParser();
-    TumblrParser(sqlite3 * db, std::string id);
+    TumblrParser(sqlite3 * db);
     virtual ~TumblrParser();
     
   protected:
