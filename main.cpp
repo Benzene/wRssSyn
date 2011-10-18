@@ -151,7 +151,11 @@ update_feeds() {
   update_tumblr_feeds(db);
   TumblrParser parser(db);
   parser.set_substitute_entities(true);
-  parser.parse_file("tumblrdashboard.auto.xml");
+  try {
+    parser.parse_file("tumblrdashboard.auto.xml");
+  } catch(xmlpp::parse_error e) {
+    std::cerr << "Parsing error: " << e.what() << std::endl;
+  }
   
   return 0;
   
@@ -224,17 +228,32 @@ int update_feed(sqlite3 * db, string url, string id, string etag, string lastmod
     RssAtomDecider preparser;
     // Convert html entities to normal characters
     preparser.set_substitute_entities(true);
-    preparser.parse_file(id + ".auto.xml");
+    try {
+      preparser.parse_file(id + ".auto.xml");
+    } catch(xmlpp::parse_error e) {
+      std::cerr << "Preparsing error: " << e.what() << std::endl;
+      return 6;
+    }
     if (preparser.is_rss2()) {
       cout << "(Rss feed)";
       RssParser parser(db, id);
       parser.set_substitute_entities(true);
-      parser.parse_file(id + ".auto.xml");
+      try {
+        parser.parse_file(id + ".auto.xml");
+      } catch(xmlpp::parse_error e) {
+	std::cerr << "Parsing error: " << e.what() << std::endl;
+	return 6;
+      }
     } else if (preparser.is_atom()) {
       cout << "(Atom feed)";
       AtomParser parser(db,id);
       parser.set_substitute_entities(true);
-      parser.parse_file(id + ".auto.xml");
+      try {
+        parser.parse_file(id + ".auto.xml");
+      } catch(xmlpp::parse_error e) {
+        std::cerr << "Parsing error: " << e.what() << std::endl;
+	return 6;
+      }
     }
 
     /*

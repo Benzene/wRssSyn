@@ -77,9 +77,9 @@ GenericParser::on_end_document() {
     // the feed properties aren't added while the content is still parsed
     // => clutters the database, and these entries might appear for different
     // feeds
-    } catch (Glib::ConvertError) {
-      std::cerr << "Parsing error. Could not parse the feed" << std::endl;
-    }
+  } catch (Glib::ConvertError) {
+    std::cerr << "Parsing error. Could not parse the feed" << std::endl;
+  }
 
 }
 
@@ -168,16 +168,16 @@ GenericParser::on_comment(const Glib::ustring& text) {
 
 void
 GenericParser::on_warning(const Glib::ustring& text) {
-  std::cerr << getParserName() << " warning : " << text << std::endl;
+  std::cerr << getParserName() << " warning : " << text; // << std::endl;
 }
 
 void
 GenericParser::on_error(const Glib::ustring& text) {
-  std::cerr << getParserName() << " error : " << text << std::endl;
+  std::cerr << getParserName() << " error : " << text; //<< std::endl;
 }
 
 void
 GenericParser::on_fatal_error(const Glib::ustring& text) {
-  std::cerr << getParserName() << " fatal error : " << text << std::endl;
+  std::cerr << getParserName() << " fatal error : " << text; // << std::endl;
 }
 

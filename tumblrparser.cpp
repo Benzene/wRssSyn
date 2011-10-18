@@ -129,16 +129,16 @@ TumblrParser::on_comment(const Glib::ustring& text) {
 
 void
 TumblrParser::on_warning(const Glib::ustring& text) {
-  std::cout << "Warning : " << text << endl;
+  std::cout << "Tumblr parser warning : " << text; // << endl;
 }
 
 void
 TumblrParser::on_error(const Glib::ustring& text) {
-  std::cout << "Error : " << text << endl;
+  std::cout << "Tumblr parser error : " << text; // << endl;
 }
 
 void
 TumblrParser::on_fatal_error(const Glib::ustring& text) {
-  std::cout << "Fatal error : " << text << endl;
+  std::cout << "Tumblr parser fatal error : " << text; // << endl;
 }
 
