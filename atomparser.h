@@ -1,11 +1,11 @@
-#ifndef MR_0710_ATOMPARSER
-#define MR_0710_ATOMPARSER
+#ifndef _WRSSSYN_ATOMPARSER_H
+#define _WRSSSYN_ATOMPARSER_H
 
-#include <libxml++/libxml++.h>
 #include <sqlite3.h>
-#include "entry.h"
+#include <string>
+#include "genericParser.h"
 
-class AtomParser : public xmlpp::SaxParser
+class AtomParser : public GenericParser
 {
   public:
     AtomParser();
@@ -13,33 +13,19 @@ class AtomParser : public xmlpp::SaxParser
     virtual ~AtomParser();
     
   protected:
-    virtual void on_start_document();
-    virtual void on_end_document();
-    virtual void on_start_element(const Glib::ustring& name,
-				  const AttributeList& properties);
-    virtual void on_end_element(const Glib::ustring& name);
-    virtual void on_characters(const Glib::ustring& characters);
-    virtual void on_comment(const Glib::ustring& text);
-    virtual void on_warning(const Glib::ustring& text);
-    virtual void on_error(const Glib::ustring& text);
-    virtual void on_fatal_error(const Glib::ustring& text);
+    virtual const Glib::ustring& getItemLabel() { return ItemLabel; }
+    virtual const Glib::ustring& getContentLabel() { return ContentLabel; }
+    virtual const Glib::ustring& getPubDateLabel() { return PubDateLabel; }
+    virtual const Glib::ustring& getUidLabel() { return UidLabel; }
+    virtual const Glib::ustring& getParserName() { return ParserName; }
     
   private:
-    bool in_entry;
-    bool header_image;
-    Glib::ustring CurrentTag;
-    
-    Entry * CurrentEntry;
-    
-    Glib::ustring GlobTitle;
-    Glib::ustring GlobUrl;
-    Glib::ustring GlobDescr;
-    Glib::ustring ImgTitle;
-    Glib::ustring ImgUrl;
-    Glib::ustring ImgLink;
-    
-    sqlite3 * db;
-    std::string id;
+    static const Glib::ustring ItemLabel;
+    static const Glib::ustring ContentLabel;
+    static const Glib::ustring PubDateLabel;
+    static const Glib::ustring UidLabel;
+    static const Glib::ustring ParserName;
+
 };
 
 #endif
