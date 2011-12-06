@@ -262,7 +262,7 @@ int update_feed(sqlite3 * db, string url, string id, string etag, string lastmod
      */
     sqlite3_stmt * sq_stmt;
     int retcode = 0;
-    string query("UPDATE sources SET etag=?, lastmodified=? WHERE website_id=? LIMIT 1");
+    string query("UPDATE sources SET etag=?, lastmodified=? WHERE website_id=?");
     retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
     if (retcode != SQLITE_OK) {
 	    cerr << "Unable to update Etag/LastModified ! (" << retcode << ")" << endl;

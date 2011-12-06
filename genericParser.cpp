@@ -34,7 +34,7 @@ GenericParser::on_end_document() {
     
     int retcode = 0;
 
-    std::string query("UPDATE sources SET title=?, url=?, descr=?, imgtitle=?, imgurl=?, imglink=? WHERE website_id=? LIMIT 1");
+    std::string query("UPDATE sources SET title=?, url=?, descr=?, imgtitle=?, imgurl=?, imglink=? WHERE website_id=?");
     sqlite3_stmt * sq_stmt;
   
     retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
