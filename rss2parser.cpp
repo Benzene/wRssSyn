@@ -11,7 +11,7 @@ RssParser::RssParser() :
 {
 }
 
-RssParser::RssParser(sqlite3 * db, std::string id) :
+RssParser::RssParser(AbstractDB * db, std::string id) :
   GenericParser(db, id)
 {
 }

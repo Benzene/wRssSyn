@@ -1,7 +1,7 @@
 #ifndef _WRSSSYN_ATOMPARSER_H
 #define _WRSSSYN_ATOMPARSER_H
 
-#include <sqlite3.h>
+#include "db.h"
 #include <string>
 #include "genericParser.h"
 
@@ -9,7 +9,7 @@ class AtomParser : public GenericParser
 {
   public:
     AtomParser();
-    AtomParser(sqlite3 * db, std::string id);
+    AtomParser(AbstractDB * db, std::string id);
     virtual ~AtomParser();
     
   protected:

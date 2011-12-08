@@ -1,7 +1,7 @@
 #ifndef MR_0710_ENTRY
 #define MR_0710_ENTRY
 
-#include <sqlite3.h>
+#include "db.h"
 #include <string>
 #include <ctime>
 
@@ -21,7 +21,7 @@ class Entry {
     ~Entry();
     void print();
     void print_title();
-    void write_to_db(sqlite3 * db, std::string website_id);
+    void write_to_db(AbstractDB * db, std::string website_id);
   
 };
 

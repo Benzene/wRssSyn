@@ -2,14 +2,14 @@
 #define MR_0710_GENERICPARSER
 
 #include <libxml++/libxml++.h>
-#include <sqlite3.h>
+#include "db.h"
 #include "entry.h"
 
 class GenericParser : public xmlpp::SaxParser
 {
   public:
     GenericParser();
-    GenericParser(sqlite3 * db, std::string id);
+    GenericParser(AbstractDB * db, std::string id);
     virtual ~GenericParser();
 
   protected:
@@ -38,14 +38,22 @@ class GenericParser : public xmlpp::SaxParser
 
     Entry * CurrentEntry;
 
+    /*
     Glib::ustring GlobTitle;
     Glib::ustring GlobUrl;
     Glib::ustring GlobDescr;
     Glib::ustring ImgTitle;
     Glib::ustring ImgUrl;
     Glib::ustring ImgLink;
+    */
+    std::string GlobTitle;
+    std::string GlobUrl;
+    std::string GlobDescr;
+    std::string ImgTitle;
+    std::string ImgUrl;
+    std::string ImgLink;
 
-    sqlite3 * db;
+    AbstractDB * db;
     std::string id;
 };
 

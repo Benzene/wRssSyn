@@ -3,7 +3,11 @@
 #include <fstream>
 #include <ctime>
 #include <curl/curl.h>
-#include <sqlite3.h>
+/* #include <sqlite3.h> */
+#include "db.h"
+#include "sqlite3db.h"
+#include "postgresdb.h"
+#include "feed.h"
 #include "auth.h"
 #include "rss2parser.h"
 #include "atomparser.h"
@@ -15,9 +19,10 @@ using namespace std;
 
 static char errorBuffer[CURL_ERROR_SIZE];
 
-sqlite3 * init_database();
+AbstractDB * init_database();
 int update_feeds();
-int update_feed(sqlite3 * db, string url, string id, string etag, string last_modified);
+int update_feed(AbstractDB * db, struct feed * f);
+//int update_feed(sqlite3 * db, string url, string id, string etag, string last_modified);
 int get_feed(string id);
 int list_feeds();
 int add_feed(string name, string url);
@@ -88,7 +93,7 @@ update_feeds() {
   ifstream fin("feedList.ini");
   
   /* Initialise database connection */
-  sqlite3 * db = init_database();
+  AbstractDB * db = init_database();
   
   /*
    * For each url in feedList.ini :
@@ -105,44 +110,21 @@ update_feeds() {
       break;
     }
 
-    sqlite3_stmt * sq_stmt;
-    int retcode = 0;
-    string query("INSERT OR IGNORE INTO sources (website_id, feed_url, user, etag, lastmodified) VALUES (?,?,?,'','')");
-    retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
-    if (retcode != SQLITE_OK) {
-	    cerr << "Database connection failed at config file parsing ! (" << retcode << ")" << endl;
-    }
-
-    retcode = sqlite3_bind_text(sq_stmt, 1, id.c_str(), -1, SQLITE_STATIC);
-    if (retcode != SQLITE_OK) {
-	    cerr << "BindText failed at config file parsing ! (" << retcode << ")" << endl;
-    }
-    retcode = sqlite3_bind_text(sq_stmt, 2, url.c_str(), -1, SQLITE_STATIC);
-    if (retcode != SQLITE_OK) {
-	    cerr << "BindText failed at config file parsing ! (" << retcode << ")" << endl;
-    }
-    retcode = sqlite3_bind_text(sq_stmt, 3, glob_login.c_str(), -1, SQLITE_STATIC);
-    if (retcode != SQLITE_OK) {
-	    cerr << "BindText failed at config file parsing ! (" << retcode << ")" << endl;
-    }
-    sqlite3_step(sq_stmt);
-
+    db->create_feed(id, url, glob_login);
   }
   cout << "done." << endl;
 
   /*
    * Next, update the already existing feeds.
    */
-  int retcode = 0;
-  sqlite3_stmt * sq_stmt;
-  string query("SELECT website_id, feed_url, etag, lastmodified FROM sources");
-  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
-  if (retcode != SQLITE_OK) {
-    cerr << "Failed to retrieve existing feeds ! (" << retcode << ")" << endl;
+  std::list<struct feed *> * f = db->get_feeds();
+  std::list<struct feed *>::iterator it;
+  for (it = f->begin(); it != f->end(); ++it) {
+    update_feed(db, (*it));
   }
-  while( sqlite3_step(sq_stmt) == SQLITE_ROW) {
-    update_feed(db, (char *)sqlite3_column_text(sq_stmt,1), (char *)sqlite3_column_text(sq_stmt,0), (char *)sqlite3_column_text(sq_stmt,2), (char *)sqlite3_column_text(sq_stmt,3));
-  }
+
+
+  // TODO: free the memory of the feeds ?
 
   /*
    * Finally, parse the special purpose feeds.
@@ -161,7 +143,13 @@ update_feeds() {
   
 }
 
-int update_feed(sqlite3 * db, string url, string id, string etag, string lastmodified) {
+//int update_feed(sqlite3 * db, string url, string id, string etag, string lastmodified) {
+int update_feed(AbstractDB * db, struct feed * f) {
+
+  std::string id = *(f->id);
+  std::string url = *(f->feed_url);
+  std::string etag = *(f->etag);
+  std::string lastmodified = *(f->lastmodified);
 
   /* Empty urls are used for custom feeds. We can silently skip them. */	
   if (url.compare("") == 0) {
@@ -260,29 +248,7 @@ int update_feed(sqlite3 * db, string url, string id, string etag, string lastmod
      * Finally, update etag and lastmodified.
      * It could be done earlier, but we would have no assurance that everything went right, and that we indeed updated. Better to do it that way.
      */
-    sqlite3_stmt * sq_stmt;
-    int retcode = 0;
-    string query("UPDATE sources SET etag=?, lastmodified=? WHERE website_id=?");
-    retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
-    if (retcode != SQLITE_OK) {
-	    cerr << "Unable to update Etag/LastModified ! (" << retcode << ")" << endl;
-    }
-
-    retcode = sqlite3_bind_text(sq_stmt, 1, headersRecipient->etag->c_str(), -1, SQLITE_STATIC);
-    if (retcode != SQLITE_OK) {
-	    cerr << "BindText failed at Etag update ! (" << retcode << ")" << endl;
-    }
-
-    retcode = sqlite3_bind_text(sq_stmt, 2, headersRecipient->lastmodified->c_str(), -1, SQLITE_STATIC);
-    if (retcode != SQLITE_OK) {
-	    cerr << "BindText failed at Etag update ! (" << retcode << ")" << endl;
-    }
-
-    retcode = sqlite3_bind_text(sq_stmt, 3, id.c_str(), -1, SQLITE_STATIC);
-    if (retcode != SQLITE_OK) {
-	    cerr << "BindText failed at Etag update ! (" << retcode << ")" << endl;
-    }
-    sqlite3_step(sq_stmt);
+    db->update_timestamps_feed(id, *(headersRecipient->etag), *(headersRecipient->lastmodified));
 
     delete headersRecipient->etag;
     delete headersRecipient->lastmodified;
@@ -326,55 +292,34 @@ size_t parse_header(void * ptr, size_t size, size_t nmemb, void * userdata) {
 
 int
 get_feed(string id) {
-  sqlite3 * db = init_database();
-  sqlite3_stmt * sq_stmt;
-  int retcode = 0;
-  
-  string query("SELECT * FROM posts WHERE website_id=? ORDER BY date DESC LIMIT 10");
-  
-  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_prepare_v2 failed ! Retcode : " << retcode << endl;
-  }
-  
-  retcode = sqlite3_bind_text(sq_stmt,1,id.c_str(),-1,SQLITE_STATIC);
-  if (retcode != SQLITE_OK) {
-    cout << "sqlite3_bind_text(1) failed ! Retcode : " << retcode << endl;
-  }
-  while ( sqlite3_step(sq_stmt) == SQLITE_ROW) {
-    string id((char *)sqlite3_column_text(sq_stmt,1));
-    string title((char *)sqlite3_column_text(sq_stmt,2));
-    string link((char *)sqlite3_column_text(sq_stmt,3));
-    time_t date = sqlite3_column_int(sq_stmt,4);
-    string description((char *)sqlite3_column_text(sq_stmt,5));
-    Entry e(id, title, link, date, description);
-    
+
+  AbstractDB * db = init_database();
+
+  std::list<std::vector<DBValue *> > entries = db->get_entries(id, 10);
+
+  std::list<std::vector<DBValue *> >::iterator it;
+  for (it = entries.begin(); it != entries.end(); ++it) {
+    Entry e(it->at(0)->getStr(),it->at(1)->getStr(),it->at(2)->getStr(),it->at(3)->getInt(), it->at(4)->getStr());
+
     e.print();
   }
-    
-  sqlite3_finalize(sq_stmt);
   
   return 0;
 }
 
 int list_feeds() {
   
-  sqlite3 * db = init_database();
-  sqlite3_stmt * sq_stmt;
-  int retcode = 0;
-  
-  string query("SELECT * FROM sources");
-  
-  retcode = sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
+  AbstractDB * db = init_database();
 
-  while ( sqlite3_step(sq_stmt) == SQLITE_ROW) {
-    cout << " * " << (char *)sqlite3_column_text(sq_stmt,0);
-    cout << ": " << (char *)sqlite3_column_text(sq_stmt,1);
-    cout << " (" << (char *)sqlite3_column_text(sq_stmt,2);
+  std::list<struct feed *> * feeds = db->get_feeds();
+
+  std::list<struct feed *>::iterator it;
+  for (it = feeds->begin(); it != feeds->end(); ++it) {
+    cout << " * " << *((*it)->id);
+    cout << ": " << *((*it)->feed_url);
+    cout << " (" << *((*it)->title);
     cout << ")" << endl;
   }
-    
-  sqlite3_finalize(sq_stmt);
   
   return 0;
 }
@@ -393,22 +338,12 @@ int add_feed(string name, string url) {
 /*
  * Open the connection and create the tables if they don't already exist.
  */
-sqlite3 * 
+AbstractDB * 
 init_database() {
-  sqlite3 * db;
-  string dbName = "feeds.db";
-  sqlite3_open_v2(dbName.c_str(), &db, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,NULL);
   
-  string query("CREATE TABLE IF NOT EXISTS posts (website_id TEXT, id TEXT, title TEXT, link TEXT, date INTEGER, description TEXT, read INTEGER, user TEXT, PRIMARY KEY (website_id, id))");
-  sqlite3_stmt * sq_stmt;
-  sqlite3_prepare_v2(db, query.c_str(), -1, &sq_stmt, NULL);
-  sqlite3_step(sq_stmt);
-  sqlite3_finalize(sq_stmt);
-  
-  string query2("CREATE TABLE IF NOT EXISTS sources (website_id TEXT PRIMARY KEY, feed_url TEXT, title TEXT, url TEXT, descr TEXT, imgtitle TEXT, imgurl TEXT, imglink TEXT, user TEXT, etag TEXT, lastmodified TEXT)");
-  sqlite3_prepare_v2(db, query2.c_str(), -1, &sq_stmt, NULL);
-  sqlite3_step(sq_stmt);
-  sqlite3_finalize(sq_stmt);
-  
-  return db;
+  if (use_postgres) {
+    return new PostgresDB();
+  } else {
+    return new Sqlite3DB();
+  }
 }

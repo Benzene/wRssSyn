@@ -11,7 +11,7 @@ TumblrParser::TumblrParser() : xmlpp::SaxParser() {
     header_image = false;
 }
 
-TumblrParser::TumblrParser(sqlite3 * db) : xmlpp::SaxParser() {
+TumblrParser::TumblrParser(AbstractDB * db) : xmlpp::SaxParser() {
     in_entry = false;
     this->db = db;
     this->id = "tumblrdashboard";

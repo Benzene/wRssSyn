@@ -11,7 +11,7 @@ AtomParser::AtomParser() :
 {
 }
 
-AtomParser::AtomParser(sqlite3 * db, std::string id) : 
+AtomParser::AtomParser(AbstractDB * db, std::string id) : 
   GenericParser(db, id)
 {
 }

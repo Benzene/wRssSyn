@@ -2,14 +2,14 @@
 #define MR_0710_TUMBLRPARSER
 
 #include <libxml++/libxml++.h>
-#include <sqlite3.h>
+#include "db.h"
 #include "tumblr_entry.h"
 
 class TumblrParser : public xmlpp::SaxParser
 {
   public:
     TumblrParser();
-    TumblrParser(sqlite3 * db);
+    TumblrParser(AbstractDB * db);
     virtual ~TumblrParser();
     
   protected:
@@ -39,7 +39,7 @@ class TumblrParser : public xmlpp::SaxParser
     Glib::ustring ImgUrl;
     Glib::ustring ImgLink;
     
-    sqlite3 * db;
+    AbstractDB * db;
     std::string id;
 };
 

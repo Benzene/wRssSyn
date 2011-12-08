@@ -2,7 +2,7 @@
 #define MR_0710_RSS2PARSER
 
 #include <libxml++/libxml++.h>
-#include <sqlite3.h>
+#include "db.h"
 #include "entry.h"
 #include "genericParser.h"
 
@@ -10,7 +10,7 @@ class RssParser : public GenericParser
 {
   public:
     RssParser();
-    RssParser(sqlite3 * db, std::string id);
+    RssParser(AbstractDB * db, std::string id);
     virtual ~RssParser();
     
   protected:
