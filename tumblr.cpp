@@ -1,12 +1,13 @@
 #include <string>
 #include "tumblr.h"
 #include "auth.h"
+#include "curl_helpers.h"
 
 using namespace std;
 
 static char errorBuffer[CURL_ERROR_SIZE];
 
-int
+std::string *
 update_tumblr_feeds(AbstractDB * db) {
   
   /*
@@ -25,7 +26,8 @@ update_tumblr_feeds(AbstractDB * db) {
   string blank("");
   db->create_feed_full(id, blank, title, url, title, blank, blank, blank, glob_login,blank,blank);
 
-  FILE * target = fopen ( "tumblrdashboard.auto.xml", "w");
+  //FILE * target = fopen ( "tumblrdashboard.auto.xml", "w");
+  std::string * target = new std::string("");
     
   CURL *curl;
   CURLcode result;
@@ -40,20 +42,19 @@ update_tumblr_feeds(AbstractDB * db) {
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postparameter.c_str());
     curl_easy_setopt(curl, CURLOPT_HEADER, 0);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, store_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, target);
       
     result = curl_easy_perform(curl);
     if(result != 0) {
       cout << "Connection error : " << errorBuffer << endl; 
-      return 3;
+      return NULL;
     }
       
     curl_easy_cleanup(curl);
   }
     
-  fclose(target);
-    
-  return 0;
+  return target;
   
 }
 

@@ -13,6 +13,7 @@
 #include "rssatomdecider.h"
 #include "tumblr.h"
 #include "tumblrparser.h"
+#include "curl_helpers.h"
 
 using namespace std;
 
@@ -32,7 +33,6 @@ struct stored_headers {
 	string * lastmodified;
 };
 size_t parse_header(void * ptr, size_t size, size_t nmemb, void * userdata);
-size_t store_data(char * ptr, size_t size, size_t nmemb, void * userdata);
 
 int
 main (int argc, char* argv[]) {
@@ -132,13 +132,16 @@ update_feeds() {
    * Finally, parse the special purpose feeds.
    * Only tumblr is in there, for now.
    */
-  update_tumblr_feeds(db);
-  TumblrParser parser(db);
-  parser.set_substitute_entities(true);
-  try {
-    parser.parse_file("tumblrdashboard.auto.xml");
-  } catch(xmlpp::parse_error e) {
-    std::cerr << "Parsing error: " << e.what() << std::endl;
+  std::string * target = update_tumblr_feeds(db);
+  if (target != NULL) {
+    TumblrParser parser(db);
+    parser.set_substitute_entities(true);
+    try {
+      //parser.parse_file("tumblrdashboard.auto.xml");
+      parser.parse_memory(*target);
+    } catch(xmlpp::parse_error e) {
+      std::cerr << "Parsing error: " << e.what() << std::endl;
+    }
   }
   
   return 0;
@@ -287,15 +290,6 @@ size_t parse_header(void * ptr, size_t size, size_t nmemb, void * userdata) {
 		}
 	}
 	
-	return size * nmemb;
-}
-
-size_t store_data(char * ptr, size_t size, size_t nmemb, void * userdata) {
-	string * storage = (string *)userdata;
-	string str(ptr, size * nmemb);
-
-	storage->append(str);
-
 	return size * nmemb;
 }
 
