@@ -23,6 +23,35 @@ TimeHelpers::convertInt(int number)
    return ss.str();
 }
 
+std::string
+TimeHelpers::getPGREInput(time_t t) {
+  struct tm * timeinfo = localtime(&t);
+  std::string format = "%Y-%m-%d %H:%M:%S";
+  char ptr[30];
+  strftime(ptr, 30, format.c_str(), timeinfo);
+
+  return std::string(ptr);
+}
+
+time_t
+TimeHelpers::stampFromPGRE(std::string &str) {
+  struct tm * timeinfo = new tm;
+  time_t retValue = 0;
+  std::string pgreFormat = "%Y-%m-%d %H:%M:%S";
+  if (strptime(str.c_str(), pgreFormat.c_str(), timeinfo) == NULL) {
+    std::cerr << "Time from pgre: " << str << " can't be converted to timestamp." << std::endl;
+  } else {
+    timeinfo->tm_isdst = -1;
+    retValue = mktime(timeinfo);
+  }
+
+  delete timeinfo;
+
+  return retValue;
+
+}
+
+
 time_t
 TimeHelpers::parseXMLtime(const string str) {
   

@@ -9,6 +9,8 @@ class TimeHelpers {
   public:
     static time_t parseXMLtime(std::string str);
     static std::string convertInt(int n);
+    static std::string getPGREInput(time_t t);
+    static time_t stampFromPGRE(std::string &str);
     
   private:
     static int str2int(const std::string str);

@@ -15,6 +15,14 @@ find_package(Sqlite3 REQUIRED)
 include_directories(${SQLITE3_INCLUDE_DIR})
 set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
+find_package(Pqxx REQUIRED)
+include_directories(${Pqxx_INCLUDE_DIR})
+set(LIBS ${LIBS} ${Pqxx_LIBRARIES})
+
+find_package(PostgreSQL REQUIRED)
+include_directories(${PostgreSQL_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${PostgreSQL_LIBRARIES})
+
 set(CMAKE_BUILD_TYPE Debug)
 
 add_executable (wRssSyn main.cpp rss2parser.cpp atomparser.cpp genericParser.cpp rssatomdecider.cpp tumblrparser.cpp tumblr.cpp tumblr_entry.cpp entry.cpp time_helpers.cpp auth.cpp db.cpp sqlite3db.cpp postgresdb.cpp)

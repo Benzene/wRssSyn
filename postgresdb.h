@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <pqxx/pqxx>
 #include "feed.h"
 
 class PostgresDB : public AbstractDB
@@ -13,7 +14,6 @@ class PostgresDB : public AbstractDB
     PostgresDB();
     virtual ~PostgresDB();
 
-    void create_feed(std::string &website_id, std::string &feed_url, std::string &user);
     void create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified);
     std::list<struct feed *> * get_feeds();
 
@@ -23,7 +23,11 @@ class PostgresDB : public AbstractDB
     void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user);
     std::list<std::vector<DBValue *> > get_entries(std::string &website_id, int num);
 
+    void init_tables();
+
   private:
+
+    pqxx::connection * db;
 
 
 };

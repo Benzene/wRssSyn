@@ -342,7 +342,9 @@ AbstractDB *
 init_database() {
   
   if (use_postgres) {
-    return new PostgresDB();
+    PostgresDB * db = new PostgresDB();
+    db->init_tables();
+    return db;
   } else {
     return new Sqlite3DB();
   }
