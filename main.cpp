@@ -23,7 +23,7 @@ int update_feeds();
 int update_feed(AbstractDB * db, struct feed * f);
 int get_feed(string id);
 int list_feeds();
-int add_feed(string name, string url);
+int add_feed(string name, string url, string user);
 
 void print_usage();
 
@@ -58,13 +58,14 @@ main (int argc, char* argv[]) {
     } else if ( cmd == "list") {
       return list_feeds();
     } else if ( cmd == "add") {
-      if (argc < 4) {
+      if (argc < 5) {
 	print_usage();
 	return 1;
       } else {
 	string name(argv[2]);
 	string url(argv[3]);
-	return add_feed(name,url);
+	string user(argv[4]);
+	return add_feed(name,url,user);
       }
     } else {
       print_usage();
@@ -103,13 +104,15 @@ update_feeds() {
   while (true) {
     std::string url;
     std::string id;
+    std::string user;
     fin >> url;
     fin >> id;
+    fin >> user;
     if (fin.eof()) {
       break;
     }
 
-    db->create_feed(id, url, glob_login);
+    db->create_feed(id, url, user);
   }
   cout << "done." << endl;
 
@@ -330,11 +333,11 @@ int list_feeds() {
   return 0;
 }
 
-int add_feed(string name, string url) {
+int add_feed(string name, string url, string user) {
 
   ofstream fout("feedList.ini", ios_base::app);
   
-  fout << url << " " << name << endl;
+  fout << url << " " << name << " " << user << endl;
   fout.close();
   
   return 0;
