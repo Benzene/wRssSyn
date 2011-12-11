@@ -122,7 +122,7 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
     txn.commit();
   } catch (pqxx::unique_violation const& exc) {
     /* This only means that the sources is already there. */
-    std::cerr << "Note: source already present in database." << std::endl;
+//    std::cerr << "Note: source already present in database." << std::endl;
   } catch (pqxx::pqxx_exception const& exc) {
     std::cerr << "Exception while creating feed !" << std::endl;
     std::cerr << exc.base().what() << std::endl;
@@ -221,7 +221,7 @@ PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &
     txn.exec(query);
     txn.commit();
   } catch (pqxx::unique_violation const& exc) {
-    std::cerr << "Note: post already exists. Skipping." << std::endl;
+//    std::cerr << "Note: post already exists. Skipping." << std::endl;
   } catch (pqxx::pqxx_exception const& exc) {
     std::cerr << "Exception while inserting entry !" << std::endl;
     std::cerr << exc.base().what() << std::endl;
