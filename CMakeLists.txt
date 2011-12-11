@@ -22,6 +22,7 @@ set(LIBS ${LIBS} ${Pqxx_LIBRARIES})
 find_package(PostgreSQL REQUIRED)
 include_directories(${PostgreSQL_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${PostgreSQL_LIBRARIES})
+link_directories(${PostgreSQL_LIBRARY_DIR})
 
 set(CMAKE_BUILD_TYPE Debug)
 
