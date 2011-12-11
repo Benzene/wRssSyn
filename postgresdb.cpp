@@ -20,7 +20,7 @@ PostgresDB::init_tables() {
   try {
     std::string qSources("CREATE TABLE IF NOT EXISTS sources "
 		  "(website_id TEXT PRIMARY KEY, "
-		  "feed_url TEXT NOT NULL, "
+		  "feed_url TEXT NOT NULL UNIQUE, "
 		  "title TEXT NOT NULL, "
 		  "url TEXT NOT NULL, "
 		  "descr TEXT NOT NULL, "
@@ -77,9 +77,26 @@ PostgresDB::init_tables() {
 void
 PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified) {
 
-  pqxx::work txn(*db);
+  /* We have to do two things:
+   * - create the feed, if we don't already have it.
+   * - subscribe the user to it.
+   */
 
-  std::string query("INSERT INTO sources "
+  pqxx::work txn(*db);
+  
+  try {
+
+    std::string uid = "";
+
+    std::string exist_query("SELECT website_id "
+		  "FROM sources "
+		  "WHERE feed_url=" + txn.quote(feed_url));
+
+    pqxx::result exist_r = txn.exec(exist_query);
+
+    if(exist_r.size() == 0) {
+
+      std::string insert_query("INSERT INTO sources "
 		  "(website_id, feed_url, title, url, descr, etag, lastmodified) VALUES ("
 		  + txn.quote(website_id) + ","
 		  + txn.quote(feed_url) + ","
@@ -89,9 +106,19 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
 		  + txn.quote(etag) + ","
 		  + txn.quote(lastmodified) + ")"
 	  );
+      txn.exec(insert_query);
 
-  try {
-    txn.exec(query);
+      uid = website_id;
+    } else {
+      uid = exist_r[0][0].as<std::string>();
+    }
+
+    std::string subscr_query("INSERT INTO subscriptions "
+		    "(\"user\", sources_id) VALUES "
+		    "(" + txn.quote(user) + "," + txn.quote(uid)
+		    + ")");
+    txn.exec(subscr_query);
+
     txn.commit();
   } catch (pqxx::unique_violation const& exc) {
     /* This only means that the sources is already there. */
