@@ -3,7 +3,6 @@
 #include <fstream>
 #include <ctime>
 #include <curl/curl.h>
-/* #include <sqlite3.h> */
 #include "db.h"
 #include "sqlite3db.h"
 #include "postgresdb.h"
@@ -22,7 +21,6 @@ static char errorBuffer[CURL_ERROR_SIZE];
 AbstractDB * init_database();
 int update_feeds();
 int update_feed(AbstractDB * db, struct feed * f);
-//int update_feed(sqlite3 * db, string url, string id, string etag, string last_modified);
 int get_feed(string id);
 int list_feeds();
 int add_feed(string name, string url);
@@ -34,6 +32,7 @@ struct stored_headers {
 	string * lastmodified;
 };
 size_t parse_header(void * ptr, size_t size, size_t nmemb, void * userdata);
+size_t store_data(char * ptr, size_t size, size_t nmemb, void * userdata);
 
 int
 main (int argc, char* argv[]) {
@@ -143,7 +142,6 @@ update_feeds() {
   
 }
 
-//int update_feed(sqlite3 * db, string url, string id, string etag, string lastmodified) {
 int update_feed(AbstractDB * db, struct feed * f) {
 
   std::string id = *(f->id);
@@ -156,7 +154,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
 	  return 4;
   }
 
-  FILE * target = fopen ( (id+".auto.xml").c_str(), "w");
+  string * target = new string("");
     
   CURL *curl;
   CURLcode result;
@@ -169,6 +167,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
     curl_easy_setopt(curl, CURLOPT_HEADER, 0);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, store_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, target);
       
     /* Set the custom headers */
@@ -209,15 +208,13 @@ int update_feed(AbstractDB * db, struct feed * f) {
     curl_slist_free_all(slist);
     curl_easy_cleanup(curl);
     
-    fclose(target);
-    
     cout << "Updating " << id << " (" << url << ")" << endl;
 
     RssAtomDecider preparser;
     // Convert html entities to normal characters
     preparser.set_substitute_entities(true);
     try {
-      preparser.parse_file(id + ".auto.xml");
+      preparser.parse_memory(*target);
     } catch(xmlpp::parse_error e) {
       std::cerr << "Preparsing error: " << e.what() << std::endl;
       return 6;
@@ -227,7 +224,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
       RssParser parser(db, id);
       parser.set_substitute_entities(true);
       try {
-        parser.parse_file(id + ".auto.xml");
+	parser.parse_memory(*target);
       } catch(xmlpp::parse_error e) {
 	std::cerr << "Parsing error: " << e.what() << std::endl;
 	return 6;
@@ -237,7 +234,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
       AtomParser parser(db,id);
       parser.set_substitute_entities(true);
       try {
-        parser.parse_file(id + ".auto.xml");
+	parser.parse_memory(*target);
       } catch(xmlpp::parse_error e) {
         std::cerr << "Parsing error: " << e.what() << std::endl;
 	return 6;
@@ -287,6 +284,15 @@ size_t parse_header(void * ptr, size_t size, size_t nmemb, void * userdata) {
 		}
 	}
 	
+	return size * nmemb;
+}
+
+size_t store_data(char * ptr, size_t size, size_t nmemb, void * userdata) {
+	string * storage = (string *)userdata;
+	string str(ptr, size * nmemb);
+
+	storage->append(str);
+
 	return size * nmemb;
 }
 
