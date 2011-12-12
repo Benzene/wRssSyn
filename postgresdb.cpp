@@ -230,10 +230,10 @@ PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &
 
 }
 
-std::list<std::vector<DBValue *> >
+std::list<Entry>
 PostgresDB::get_entries(std::string &website_id, int num) {
   pqxx::work txn(*db);
-  std::list<std::vector<DBValue *> > l;
+  std::list<Entry> l;
 
   std::string query("SELECT id, title, link, date, description "
 		  "FROM posts "
@@ -247,16 +247,15 @@ PostgresDB::get_entries(std::string &website_id, int num) {
     std::cout << r.size() << " entries found for feed " << website_id << std::endl;
 
     for (int i = 0; i < r.size(); ++i) {
-      std::vector<DBValue *> v(5);
-
-      v[0] = new DBValue(r[i][0].as<std::string>());
-      v[1] = new DBValue(r[i][1].as<std::string>());
-      v[2] = new DBValue(r[i][2].as<std::string>());
       std::string date = r[i][3].as<std::string>();
-      v[3] = new DBValue(TimeHelpers::stampFromPGRE(date));
-      v[4] = new DBValue(r[i][4].as<std::string>());
+      int date_i = TimeHelpers::stampFromPGRE(date);
 
-      l.push_back(v);
+      Entry e(r[i][0].as<std::string>(),
+		      r[i][1].as<std::string>(),
+		      r[i][2].as<std::string>(),
+		      date_i,
+		      r[i][4].as<std::string>());
+      l.push_back(e);
     }
   } catch (pqxx::pqxx_exception const& exc) {
     std::cerr << "Exception while getting entries for " << website_id << std::endl;

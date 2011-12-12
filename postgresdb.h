@@ -7,6 +7,7 @@
 #include <vector>
 #include <pqxx/pqxx>
 #include "feed.h"
+#include "entry.h"
 
 class PostgresDB : public AbstractDB
 {
@@ -21,7 +22,7 @@ class PostgresDB : public AbstractDB
     void update_metadata_feed(std::string &website_id, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink);
 
     void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user);
-    std::list<std::vector<DBValue *> > get_entries(std::string &website_id, int num);
+    std::list<Entry> get_entries(std::string &website_id, int num);
 
     void init_tables();
 

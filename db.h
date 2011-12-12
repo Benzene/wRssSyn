@@ -44,7 +44,7 @@ class AbstractDB
 
     void insert_entry(std::string &website_id, Entry &entry);
     void insert_entry(std::string &website_id, TumblrEntry &entry);
-    virtual std::list<std::vector<DBValue *> > get_entries(std::string &website_id, int num) =0;
+    virtual std::list<Entry> get_entries(std::string &website_id, int num) =0;
 
   protected:
     virtual void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user) =0;

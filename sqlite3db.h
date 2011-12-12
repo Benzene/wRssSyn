@@ -7,6 +7,7 @@
 #include <list>
 #include <vector>
 #include "feed.h"
+#include "entry.h"
 
 class Sqlite3Value : public DBValue {
 
@@ -30,7 +31,7 @@ class Sqlite3DB : public AbstractDB
 
     void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user);
 
-    std::list<std::vector<DBValue *> > get_entries(std::string &website_id, int num);
+    std::list<Entry> get_entries(std::string &website_id, int num);
 
   private:
     // Management functions. Might be something that can be made as a standalone wrapper ?

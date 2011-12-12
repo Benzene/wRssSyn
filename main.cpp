@@ -298,13 +298,11 @@ get_feed(string id) {
 
   AbstractDB * db = init_database();
 
-  std::list<std::vector<DBValue *> > entries = db->get_entries(id, 10);
+  std::list<Entry> entries = db->get_entries(id, 10);
 
-  std::list<std::vector<DBValue *> >::iterator it;
+  std::list<Entry>::iterator it;
   for (it = entries.begin(); it != entries.end(); ++it) {
-    Entry e(it->at(0)->getStr(),it->at(1)->getStr(),it->at(2)->getStr(),it->at(3)->getInt(), it->at(4)->getStr());
-
-    e.print();
+    (*it).print();
   }
   
   return 0;

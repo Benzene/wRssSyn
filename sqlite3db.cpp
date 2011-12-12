@@ -186,8 +186,7 @@ void Sqlite3DB::insert_entry(std::string &website_id, std::string &id, std::stri
 
 }
 
-std::list<std::vector<DBValue *> > Sqlite3DB::get_entries(std::string &website_id, int num) {
-  //std::string query("SELECT id, title, link, date, descr FROM posts WHERE website_id=? ORDER BY date DESC LIMIT ?");
+std::list<Entry> Sqlite3DB::get_entries(std::string &website_id, int num) {
   std::string query("SELECT id, title, link, date, description FROM posts WHERE website_id=? ORDER BY date DESC LIMIT ?");
 
   std::vector<Sqlite3Value> values(2);
@@ -201,20 +200,18 @@ std::list<std::vector<DBValue *> > Sqlite3DB::get_entries(std::string &website_i
   types[3] = Sqlite3Value(0);
   types[4] = Sqlite3Value("");
 
-  /* There might be a way to make this cast more quickly. For now, we will have to manually make Sqlite3Value:s DBValue:s */
   std::list<std::vector<Sqlite3Value *> > internalL = execReturnStmt(query, values, types, "[Get entries]");
 
-  std::list<std::vector<DBValue *> > externalL;
+  std::list<Entry> externalL;
 
   std::list<std::vector<Sqlite3Value *> >::iterator it;
   for(it = internalL.begin(); it != internalL.end(); ++it) {
-    std::vector<DBValue *> newVect(it->size());
-
-    for (int i = 0; i < newVect.size(); ++i) {
-      newVect[i] = new DBValue(*(it->at(i)));
-    }
-
-    externalL.push_back(newVect);
+    Entry e(it->at(0)->getStr(),
+		    it->at(1)->getStr(),
+		    it->at(2)->getStr(),
+		    it->at(3)->getInt(),
+		    it->at(4)->getStr());
+    externalL.push_back(e);
   }
 
   return externalL;
