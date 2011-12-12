@@ -63,14 +63,16 @@ AbstractDB::create_feed(std::string &website_id, std::string &feed_url, std::str
 
 void
 AbstractDB::insert_entry(std::string &website_id, Entry &entry) {
-  std::string &uid = entry.id;
+  std::string * uid = NULL;
   if (entry.id == "") {
-    uid = entry.link;
-  } 
+    uid = &(entry.link);
+  } else {
+    uid = &(entry.id);
+  }
 
   time_t ret = TimeHelpers::parseXMLtime(entry.date);
 
-  insert_entry(website_id, uid, entry.title, entry.link, ret, entry.description, glob_login);
+  insert_entry(website_id, *uid, entry.title, entry.link, ret, entry.description, glob_login);
 }
 
 void
