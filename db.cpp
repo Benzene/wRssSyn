@@ -1,4 +1,6 @@
 #include "db.h"
+#include "auth.h"
+#include "time_helpers.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -57,4 +59,23 @@ AbstractDB::create_feed(std::string &website_id, std::string &feed_url, std::str
   std::string blank("");
 
   create_feed_full(website_id, feed_url, blank, blank, blank, blank, blank, blank, user, blank, blank);
+}
+
+void
+AbstractDB::insert_entry(std::string &website_id, Entry &entry) {
+  std::string &uid = entry.id;
+  if (entry.id == "") {
+    uid = entry.link;
+  } 
+
+  time_t ret = TimeHelpers::parseXMLtime(entry.date);
+
+  insert_entry(website_id, uid, entry.title, entry.link, ret, entry.description, glob_login);
+}
+
+void
+AbstractDB::insert_entry(std::string &website_id, TumblrEntry &entry) {
+  entry.description = entry.build_content();
+
+  insert_entry(website_id, (Entry&)entry);
 }

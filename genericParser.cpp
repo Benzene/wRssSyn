@@ -64,7 +64,7 @@ GenericParser::on_end_element(const Glib::ustring& name) {
   CurrentTag = "";
 
   if (name == getItemLabel()) {
-    CurrentEntry->write_to_db(db, id);
+    db->insert_entry(id, *CurrentEntry);
     delete CurrentEntry;
 
     in_entry = false;

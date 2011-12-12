@@ -25,22 +25,6 @@ TumblrEntry::print() {
   cout << "Description : " << description << endl;
 }
 
-void
-TumblrEntry::write_to_db(AbstractDB * db, std::string website_id) {
-
-  std::string * uid = NULL;
-  if (id == "") {
-    uid = &link;
-  } else {
-    uid = &id;
-  }
-
-  int ret = TimeHelpers::parseXMLtime(date);
-  std::string descr = build_content();
-
-  db->insert_entry(website_id, *uid, title, link, ret, descr, glob_login);
-}
-
 std::string
 TumblrEntry::build_content() {
     std::string ret = "";

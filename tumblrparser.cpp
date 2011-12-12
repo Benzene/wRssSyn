@@ -84,7 +84,7 @@ TumblrParser::on_end_element(const Glib::ustring& name) {
   
   if (name == "post") {
     
-    CurrentEntry->write_to_db(db, id);
+    db->insert_entry(id, *CurrentEntry);
     delete CurrentEntry;
     
     in_entry = false;

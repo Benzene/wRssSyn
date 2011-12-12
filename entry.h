@@ -1,7 +1,6 @@
 #ifndef MR_0710_ENTRY
 #define MR_0710_ENTRY
 
-#include "db.h"
 #include <string>
 #include <ctime>
 
@@ -21,7 +20,6 @@ class Entry {
     ~Entry();
     void print();
     void print_title();
-    void write_to_db(AbstractDB * db, std::string website_id);
   
 };
 

@@ -39,20 +39,3 @@ Entry::print_title() {
   cout << "Title : " << title << endl;
 }
 
-void
-Entry::write_to_db(AbstractDB * db, std::string website_id) {
-
-  std::string * uid = NULL;
-  if (id == "") {
-    uid = &link;
-  } else {
-    uid = &id;
-  }
-
-//  cout << "Parsing date : " << date << endl;
-  time_t ret = TimeHelpers::parseXMLtime(date);
-//  cout << "parseXMLtime() returned : " << ret << endl;
-//
-  db->insert_entry(website_id, *uid, title, link, ret, description, glob_login);
-  
-}

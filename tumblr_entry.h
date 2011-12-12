@@ -5,7 +5,6 @@
 #include <ctime>
 #include <glibmm/ustring.h>
 #include "entry.h"
-#include "db.h"
 
 class TumblrEntry : public Entry {
   
@@ -33,7 +32,6 @@ class TumblrEntry : public Entry {
     TumblrEntry();
     ~TumblrEntry();
     void print();
-    void write_to_db(AbstractDB * db, std::string website_id);
     std::string build_content();
   
 };
