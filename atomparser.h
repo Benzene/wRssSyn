@@ -2,7 +2,6 @@
 #define _WRSSSYN_ATOMPARSER_H
 
 #include "db.h"
-#include <string>
 #include "genericParser.h"
 
 class AtomParser : public GenericParser

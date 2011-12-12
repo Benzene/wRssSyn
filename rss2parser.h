@@ -1,9 +1,7 @@
 #ifndef MR_0710_RSS2PARSER
 #define MR_0710_RSS2PARSER
 
-#include <libxml++/libxml++.h>
 #include "db.h"
-#include "entry.h"
 #include "genericParser.h"
 
 class RssParser : public GenericParser

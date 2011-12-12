@@ -124,21 +124,20 @@ GenericParser::on_cdata_block(const Glib::ustring& text) {
 
 void
 GenericParser::on_comment(const Glib::ustring& text) {
-//  std::cout << "Comments : " << text << endl;
 }
 
 void
 GenericParser::on_warning(const Glib::ustring& text) {
-  std::cerr << getParserName() << " warning : " << text; // << std::endl;
+  std::cerr << getParserName() << " warning : " << text;
 }
 
 void
 GenericParser::on_error(const Glib::ustring& text) {
-  std::cerr << getParserName() << " error : " << text; //<< std::endl;
+  std::cerr << getParserName() << " error : " << text;
 }
 
 void
 GenericParser::on_fatal_error(const Glib::ustring& text) {
-  std::cerr << getParserName() << " fatal error : " << text; // << std::endl;
+  std::cerr << getParserName() << " fatal error : " << text;
 }
 

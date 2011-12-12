@@ -2,7 +2,6 @@
 #include <glibmm/convert.h> // For Glib::ConvertError
 
 #include <iostream>
-#include "auth.h"
 
 using namespace std;
 
@@ -24,21 +23,12 @@ TumblrParser::~TumblrParser() {
 
 void
 TumblrParser::on_start_document() {
-
-//  cout << "on_start_document()" << endl;
-  
 }
 
 void
 TumblrParser::on_end_document() {
   
-//  cout << "on_end_document()" << endl;
-  
   try {
-//  std::cout << "Feed Properties : " << endl;
-//  std::cout << "Title : " << GlobTitle << endl;
-//  std::cout << "Url : " << GlobUrl << endl;
-//  std::cout << "Description : " << GlobDescr << endl;
 
   // TODO: Check that this doesn't do weird things
   // the feed properties aren't added while the content is still parsed
@@ -129,16 +119,16 @@ TumblrParser::on_comment(const Glib::ustring& text) {
 
 void
 TumblrParser::on_warning(const Glib::ustring& text) {
-  std::cout << "Tumblr parser warning : " << text; // << endl;
+  std::cout << "Tumblr parser warning : " << text;
 }
 
 void
 TumblrParser::on_error(const Glib::ustring& text) {
-  std::cout << "Tumblr parser error : " << text; // << endl;
+  std::cout << "Tumblr parser error : " << text;
 }
 
 void
 TumblrParser::on_fatal_error(const Glib::ustring& text) {
-  std::cout << "Tumblr parser fatal error : " << text; // << endl;
+  std::cout << "Tumblr parser fatal error : " << text;
 }
 

@@ -1,10 +1,5 @@
 #include <iostream>
-#include <cstdlib>
 #include "entry.h"
-
-#include "auth.h"
-#include "time_helpers.h"
-
 
 using namespace std;
 

@@ -10,6 +10,7 @@ PostgresDB::PostgresDB() {
 }
 
 PostgresDB::~PostgresDB() {
+  delete db;
 
 }
 

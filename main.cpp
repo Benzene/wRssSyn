@@ -82,9 +82,9 @@ print_usage() {
     cerr << "Usage : wRssSyn <command>" << endl;
     cerr << "With <command> is one of : " << endl;
     cerr << "  update 		updates the feeds" << endl;
-    cerr << "  get [feed_id]	prints last entries for feed [feed_id]" << endl;
+    cerr << "  get <feed_id>	prints last entries for feed <feed_id>" << endl;
     cerr << "  list		prints the list of feeds currently registered" << endl;
-    cerr << "  add [name] [url]	adds an rss url to the list" << endl; 
+    cerr << "  add <name> <url>	<user> adds an rss url to the list" << endl; 
 }
 
 int
@@ -137,12 +137,15 @@ update_feeds() {
     TumblrParser parser(db);
     parser.set_substitute_entities(true);
     try {
-      //parser.parse_file("tumblrdashboard.auto.xml");
       parser.parse_memory(*target);
     } catch(xmlpp::parse_error e) {
       std::cerr << "Parsing error: " << e.what() << std::endl;
     }
+
+    delete target;
   }
+
+  delete db;
   
   return 0;
   
@@ -246,6 +249,8 @@ int update_feed(AbstractDB * db, struct feed * f) {
 	return 6;
       }
     }
+    
+    delete target;
 
     /*
      * Finally, update etag and lastmodified.
@@ -255,6 +260,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
 
     delete headersRecipient->etag;
     delete headersRecipient->lastmodified;
+    delete headersRecipient;
 
     cout << " done" << endl;
   }
@@ -304,6 +310,8 @@ get_feed(string id) {
   for (it = entries.begin(); it != entries.end(); ++it) {
     (*it).print();
   }
+
+  delete db;
   
   return 0;
 }
@@ -321,6 +329,8 @@ int list_feeds() {
     cout << " (" << *((*it)->title);
     cout << ")" << endl;
   }
+
+  delete db;
   
   return 0;
 }

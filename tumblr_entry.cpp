@@ -1,10 +1,5 @@
 #include <iostream>
-#include <cstdlib>
 #include "tumblr_entry.h"
-
-#include "time_helpers.h"
-#include "auth.h"
-
 
 using namespace std;
 

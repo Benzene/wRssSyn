@@ -26,7 +26,7 @@ Sqlite3DB::Sqlite3DB() {
 }
 
 Sqlite3DB::~Sqlite3DB() {
-
+  sqlite3_close(db);
 }
 
 sqlite3_stmt * Sqlite3DB::buildStatement(std::string &query, std::vector<Sqlite3Value> &values, std::string debugPosition) {
@@ -211,6 +211,11 @@ std::list<Entry> Sqlite3DB::get_entries(std::string &website_id, int num) {
 		    it->at(2)->getStr(),
 		    it->at(3)->getInt(),
 		    it->at(4)->getStr());
+    delete it->at(0);
+    delete it->at(1);
+    delete it->at(2);
+    delete it->at(3);
+    delete it->at(4);
     externalL.push_back(e);
   }
 

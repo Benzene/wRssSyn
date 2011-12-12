@@ -1,4 +1,5 @@
-#include <string>
+#include <iostream>
+#include <curl/curl.h>
 #include "tumblr.h"
 #include "auth.h"
 #include "curl_helpers.h"
@@ -26,7 +27,6 @@ update_tumblr_feeds(AbstractDB * db) {
   string blank("");
   db->create_feed_full(id, blank, title, url, title, blank, blank, blank, glob_login,blank,blank);
 
-  //FILE * target = fopen ( "tumblrdashboard.auto.xml", "w");
   std::string * target = new std::string("");
     
   CURL *curl;
@@ -38,6 +38,7 @@ update_tumblr_feeds(AbstractDB * db) {
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
     curl_easy_setopt(curl, CURLOPT_URL, "http://www.tumblr.com/api/dashboard");
     curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // TODO: what if email/password come from an insecure source ?
     string postparameter = "email=" + tumblr_email + "&password=" + tumblr_password + "&num=20";
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postparameter.c_str());
     curl_easy_setopt(curl, CURLOPT_HEADER, 0);

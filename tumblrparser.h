@@ -32,12 +32,12 @@ class TumblrParser : public xmlpp::SaxParser
     
     TumblrEntry * CurrentEntry;
     
-    Glib::ustring GlobTitle;
-    Glib::ustring GlobUrl;
-    Glib::ustring GlobDescr;
-    Glib::ustring ImgTitle;
-    Glib::ustring ImgUrl;
-    Glib::ustring ImgLink;
+    std::string GlobTitle;
+    std::string GlobUrl;
+    std::string GlobDescr;
+    std::string ImgTitle;
+    std::string ImgUrl;
+    std::string ImgLink;
     
     AbstractDB * db;
     std::string id;

@@ -38,14 +38,6 @@ class GenericParser : public xmlpp::SaxParser
 
     Entry * CurrentEntry;
 
-    /*
-    Glib::ustring GlobTitle;
-    Glib::ustring GlobUrl;
-    Glib::ustring GlobDescr;
-    Glib::ustring ImgTitle;
-    Glib::ustring ImgUrl;
-    Glib::ustring ImgLink;
-    */
     std::string GlobTitle;
     std::string GlobUrl;
     std::string GlobDescr;
