@@ -125,6 +125,7 @@ update_feeds() {
     update_feed(db, (*it));
     delete (*it);
   }
+  delete f;
 
 
   // TODO: free the memory of the feeds ?

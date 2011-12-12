@@ -37,6 +37,8 @@ class AbstractDB
 
     virtual void create_feed(std::string &website_id, std::string &feed_url, std::string &user);
     virtual void create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified) =0;
+
+    // The caller is responsible for freeing the feeds.
     virtual std::list<struct feed *> * get_feeds() =0;
 
     virtual void update_timestamps_feed(std::string &website_id, std::string &etag, std::string &lastmodified) =0;
