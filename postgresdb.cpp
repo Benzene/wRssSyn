@@ -147,11 +147,11 @@ PostgresDB::get_feeds() {
 
     for(int i = 0; i < r.size(); ++i) {
       struct feed * f = new struct feed;
-      f->id = new std::string(r[i]["website_id"].as<std::string>());
-      f->feed_url = new std::string(r[i]["feed_url"].as<std::string>());
-      f->title = new std::string(r[i]["title"].as<std::string>());
-      f->etag = new std::string(r[i]["etag"].as<std::string>());
-      f->lastmodified = new std::string(r[i]["lastmodified"].as<std::string>());
+      f->id = r[i]["website_id"].as<std::string>();
+      f->feed_url = r[i]["feed_url"].as<std::string>();
+      f->title = r[i]["title"].as<std::string>();
+      f->etag = r[i]["etag"].as<std::string>();
+      f->lastmodified = r[i]["lastmodified"].as<std::string>();
       externalL->push_back(f);
     }
 

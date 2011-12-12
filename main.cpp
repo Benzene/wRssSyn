@@ -123,6 +123,7 @@ update_feeds() {
   std::list<struct feed *>::iterator it;
   for (it = f->begin(); it != f->end(); ++it) {
     update_feed(db, (*it));
+    delete (*it);
   }
 
 
@@ -153,10 +154,10 @@ update_feeds() {
 
 int update_feed(AbstractDB * db, struct feed * f) {
 
-  std::string id = *(f->id);
-  std::string url = *(f->feed_url);
-  std::string etag = *(f->etag);
-  std::string lastmodified = *(f->lastmodified);
+  std::string &id = f->id;
+  std::string &url = f->feed_url;
+  std::string &etag = f->etag;
+  std::string &lastmodified = f->lastmodified;
 
   /* Empty urls are used for custom feeds. We can silently skip them. */	
   if (url.compare("") == 0) {
@@ -324,12 +325,14 @@ int list_feeds() {
 
   std::list<struct feed *>::iterator it;
   for (it = feeds->begin(); it != feeds->end(); ++it) {
-    cout << " * " << *((*it)->id);
-    cout << ": " << *((*it)->feed_url);
-    cout << " (" << *((*it)->title);
+    cout << " * " << (*it)->id;
+    cout << ": " << (*it)->feed_url;
+    cout << " (" << (*it)->title;
     cout << ")" << endl;
+    delete (*it);
   }
 
+  delete feeds;
   delete db;
   
   return 0;

@@ -130,11 +130,11 @@ std::list<struct feed *> * Sqlite3DB::get_feeds() {
   std::list<std::vector<Sqlite3Value *> >::iterator it;
   for (it = internalL.begin(); it != internalL.end(); ++it) {
     struct feed * f = new struct feed;
-    f->id = new std::string(it->at(0)->getStr());
-    f->feed_url = new std::string(it->at(1)->getStr());
-    f->title = new std::string(it->at(2)->getStr());
-    f->etag = new std::string(it->at(3)->getStr());
-    f->lastmodified = new std::string(it->at(4)->getStr());
+    f->id = it->at(0)->getStr();
+    f->feed_url = it->at(1)->getStr();
+    f->title = it->at(2)->getStr();
+    f->etag = it->at(3)->getStr();
+    f->lastmodified = it->at(4)->getStr();
     externalL->push_back(f);
   }
 

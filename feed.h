@@ -4,11 +4,11 @@
 #include <string>
 
 struct feed {
-  std::string * id;
-  std::string * feed_url;
-  std::string * title;
-  std::string * etag;
-  std::string * lastmodified;
+  std::string id;
+  std::string feed_url;
+  std::string title;
+  std::string etag;
+  std::string lastmodified;
 };
 
 #endif
