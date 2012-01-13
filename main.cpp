@@ -141,7 +141,7 @@ update_feeds() {
     try {
       parser.parse_memory(*target);
     } catch(xmlpp::parse_error e) {
-      std::cerr << "Parsing error: " << e.what() << std::endl;
+      std::cerr << "Parsing error on tumblr feed: " << e.what() << std::endl;
     }
 
     delete target;
@@ -227,7 +227,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
     try {
       preparser.parse_memory(*target);
     } catch(xmlpp::parse_error e) {
-      std::cerr << "Preparsing error: " << e.what() << std::endl;
+      std::cerr << "Preparsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
       return 6;
     }
     if (preparser.is_rss2()) {
@@ -237,7 +237,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
       try {
 	parser.parse_memory(*target);
       } catch(xmlpp::parse_error e) {
-	std::cerr << "Parsing error: " << e.what() << std::endl;
+	std::cerr << "Parsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
 	return 6;
       }
     } else if (preparser.is_atom()) {
@@ -247,7 +247,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
       try {
 	parser.parse_memory(*target);
       } catch(xmlpp::parse_error e) {
-        std::cerr << "Parsing error: " << e.what() << std::endl;
+        std::cerr << "Parsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
 	return 6;
       }
     }
