@@ -14,6 +14,14 @@ get '/' do
   haml :feedSources
 end
 
+get '/about' do
+  haml :about
+end
+
+get '/crawler' do
+  haml :crawler
+end
+
 get '/new/:feed' do
   require_auth	
   pair = [ params[:feed], session[:user] ]
