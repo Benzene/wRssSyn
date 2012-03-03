@@ -6,6 +6,9 @@
 extern std::string glob_login;
 extern std::string tumblr_email;
 extern std::string tumblr_password;
+
 extern bool use_postgres;
+
+extern std::string useragent; 
 
 #endif

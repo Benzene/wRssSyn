@@ -180,6 +180,7 @@ int update_feed(AbstractDB * db, struct feed * f) {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, store_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, target);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, useragent.c_str());
       
     /* Set the custom headers */
     struct curl_slist * slist = NULL;
