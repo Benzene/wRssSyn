@@ -1,10 +1,12 @@
 :markdown
   Hej,
+
   If you came here, it's probably because your page has been visited by our rss crawler. Its purpose is to fetch rss feeds and make them availabe to our users through our interface.
 
   Here are some quick technicals facts about our crawler:
-  - The default delay between two crawls is 20 minutes.
-  - User agent is "Mozilla/5.0 (compatible; wRssSyn crawler; +#{url('about')})"
-  - "Etag" and "Last-Modified" http headers should be honored
 
-  If you have any problem, shoot us an email at [rss@leukensis.org](mailto:rss@leukensis.org) and we'll look into it.
+  - It hits pages about once every 20 minutes.  
+  - User agent is "Mozilla/5.0 (compatible; wRssSyn crawler; +https://rss.leukensis.org/crawler)"
+  - It tries to respect "Etag" and "Last-Modified" http headers to prevent refetching the feed if it hasn't changed
+
+  If you notice any anormal behavior, or if you have any questions, shoot us an email at [rss@leukensis.org](mailto:rss@leukensis.org) and we'll look into it.
