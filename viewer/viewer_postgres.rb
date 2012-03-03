@@ -8,10 +8,14 @@ before do
 end
 
 get '/' do
-  require_auth	
-  pair = [ session[:user] ]
-  @sources = @db.exec('SELECT sources.website_id, title, url, descr, c FROM sources LEFT JOIN (SELECT website_id, COUNT(uid) as c FROM posts WHERE posts.uid NOT IN (SELECT post_id FROM readeds WHERE "user"=$1) GROUP BY website_id) as counts ON sources.website_id = counts.website_id INNER JOIN (SELECT sources_id FROM subscriptions WHERE "user"=$1) AS subscriptions ON sources.website_id=subscriptions.sources_id', pair)
-  haml :feedSources
+  if !is_authed? then
+    redirect('/about')
+  else
+    require_auth	
+    pair = [ session[:user] ]
+    @sources = @db.exec('SELECT sources.website_id, title, url, descr, c FROM sources LEFT JOIN (SELECT website_id, COUNT(uid) as c FROM posts WHERE posts.uid NOT IN (SELECT post_id FROM readeds WHERE "user"=$1) GROUP BY website_id) as counts ON sources.website_id = counts.website_id INNER JOIN (SELECT sources_id FROM subscriptions WHERE "user"=$1) AS subscriptions ON sources.website_id=subscriptions.sources_id', pair)
+    haml :feedSources
+  end
 end
 
 get '/about' do
