@@ -205,6 +205,23 @@ PostgresDB::update_metadata_feed(std::string &website_id, std::string &title, st
 }
 
 void
+PostgresDB::update_feed_url(std::string &website_id, std::string &feed_url) {
+  pqxx::work txn(*db);
+  std::string query("UPDATE sources SET "
+		  "feed_url=" + txn.quote(feed_url) + " "
+		  "WHERE website_id=" + txn.quote(website_id));
+
+  try {
+    txn.exec(query);
+    txn.commit();
+  } catch (pqxx::pqxx_exception const& exc) {
+    std::cerr << "Exception while updating feed's metadata !" << std::endl;
+    std::cerr << exc.base().what() << std::endl;
+    exit(-1);
+  }
+}
+
+void
 PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user) {
   pqxx::work txn(*db);
   std::string d = TimeHelpers::getPGREInput(date);

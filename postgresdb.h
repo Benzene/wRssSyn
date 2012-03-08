@@ -21,6 +21,8 @@ class PostgresDB : public AbstractDB
     void update_timestamps_feed(std::string &website_id, std::string &etag, std::string &lastmodified);
     void update_metadata_feed(std::string &website_id, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink);
 
+    void update_feed_url(std::string &website_id, std::string &title);
+
     void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user);
     std::list<Entry> get_entries(std::string &website_id, int num);
 

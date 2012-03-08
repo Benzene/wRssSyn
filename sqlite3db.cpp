@@ -169,6 +169,17 @@ void Sqlite3DB::update_metadata_feed(std::string &website_id, std::string &title
 
 }
 
+void Sqlite3DB::update_feed_url(std::string &website_id, std::string &feed_url) {
+  std::string query("UPDATE sources SET feed_url=? WHERE website_id=?");
+
+  std::vector<Sqlite3Value> values(2);
+  values[0] = Sqlite3Value(feed_url);
+  values[1] = Sqlite3Value(website_id);
+
+  execNoReturnStmt(query, values, "[Update feed url]");
+
+}
+
 void Sqlite3DB::insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user) {
 
   std::string query("INSERT OR IGNORE INTO posts VALUES (?,?,?,?,?,?,0,?)");

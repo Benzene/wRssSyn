@@ -25,6 +25,7 @@ int update_feed(AbstractDB * db, struct feed * f);
 int get_feed(string id);
 int list_feeds();
 int add_feed(string name, string url, string user);
+int update_feed_url(string name, string newurl);
 
 void print_usage();
 
@@ -67,6 +68,15 @@ main (int argc, char* argv[]) {
 	string user(argv[4]);
 	return add_feed(name,url,user);
       }
+    } else if ( cmd == "update_url") {
+      if (argc < 4) {
+        print_usage();
+	return 1;
+      } else {
+        string name(argv[2]);
+	string url(argv[3]);
+	return update_feed_url(name,url);
+      }
     } else {
       print_usage();
       return 1;
@@ -85,6 +95,7 @@ print_usage() {
     cerr << "  get <feed_id>	prints last entries for feed <feed_id>" << endl;
     cerr << "  list		prints the list of feeds currently registered" << endl;
     cerr << "  add <name> <url>	<user> adds an rss url to the list" << endl; 
+    cerr << "  update_url <name> <new_url> updates the url of a feed" << endl;
 }
 
 int
@@ -347,6 +358,14 @@ int add_feed(string name, string url, string user) {
   fout << url << " " << name << " " << user << endl;
   fout.close();
   
+  return 0;
+}
+
+int update_feed_url(string name, string newurl) {
+  AbstractDB * db = init_database();
+
+  db->update_feed_url(name, newurl);
+
   return 0;
 }
 

@@ -44,6 +44,8 @@ class AbstractDB
     virtual void update_timestamps_feed(std::string &website_id, std::string &etag, std::string &lastmodified) =0;
     virtual void update_metadata_feed(std::string &website_id, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink) =0;
 
+    virtual void update_feed_url(std::string &website_id, std::string &feed_url) =0;
+
     void insert_entry(std::string &website_id, Entry &entry);
     void insert_entry(std::string &website_id, TumblrEntry &entry);
     virtual std::list<Entry> get_entries(std::string &website_id, int num) =0;
