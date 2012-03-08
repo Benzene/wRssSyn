@@ -22,7 +22,7 @@ static char errorBuffer[CURL_ERROR_SIZE];
 AbstractDB * init_database();
 int update_feeds();
 int update_single_feed(string id);
-int update_feed(AbstractDB * db, struct feed * f);
+int update_feed(AbstractDB * db, struct feed * f, bool force);
 int get_feed(string id);
 int list_feeds();
 int add_feed(string name, string url, string user);
@@ -139,7 +139,7 @@ update_feeds() {
   std::list<struct feed *> * f = db->get_feeds();
   std::list<struct feed *>::iterator it;
   for (it = f->begin(); it != f->end(); ++it) {
-    update_feed(db, (*it));
+    update_feed(db, (*it), false);
     delete (*it);
   }
   delete f;
@@ -180,7 +180,7 @@ int update_single_feed(string id) {
   std::list<struct feed *>::iterator it;
   for (it = f->begin(); it != f->end(); ++it) {
     if((*it)->id == id) {
-      retVal = update_feed(db, (*it));
+      retVal = update_feed(db, (*it), true);
     }
     delete (*it);
   }
@@ -191,7 +191,7 @@ int update_single_feed(string id) {
   return retVal;
 }
 
-int update_feed(AbstractDB * db, struct feed * f) {
+int update_feed(AbstractDB * db, struct feed * f, bool force) {
 
   std::string &id = f->id;
   std::string &url = f->feed_url;
@@ -222,13 +222,15 @@ int update_feed(AbstractDB * db, struct feed * f) {
       
     /* Set the custom headers */
     struct curl_slist * slist = NULL;
-    string ifmodifheader = "If-Modified-Since: ";
-    ifmodifheader.append(lastmodified);
-    string ifetagheader = "If-None-Match: ";
-    ifetagheader.append(etag);
-    slist = curl_slist_append(slist, ifmodifheader.c_str());
-    slist = curl_slist_append(slist, ifetagheader.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
+    if (!force) {
+      string ifmodifheader = "If-Modified-Since: ";
+      ifmodifheader.append(lastmodified);
+      string ifetagheader = "If-None-Match: ";
+      ifetagheader.append(etag);
+      slist = curl_slist_append(slist, ifmodifheader.c_str());
+      slist = curl_slist_append(slist, ifetagheader.c_str());
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
+    }
 
     /* Read the custom headers */
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &parse_header);
@@ -255,7 +257,9 @@ int update_feed(AbstractDB * db, struct feed * f) {
 	    return 3;
     }
       
-    curl_slist_free_all(slist);
+    if (!force) {
+      curl_slist_free_all(slist);
+    }
     curl_easy_cleanup(curl);
     
     cout << "Updating " << id << " (" << url << ")" << endl;
