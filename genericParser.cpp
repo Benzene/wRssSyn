@@ -128,16 +128,31 @@ GenericParser::on_comment(const Glib::ustring& text) {
 
 void
 GenericParser::on_warning(const Glib::ustring& text) {
-  std::cerr << getParserName() << " warning : " << text;
+  std::cerr << getParserName() << " warning : ";
+  try {
+    std::cerr << text;
+  } catch(Glib::ConvertError e) {
+    std::cerr << "ConvertError" << std::endl;
+  }
 }
 
 void
 GenericParser::on_error(const Glib::ustring& text) {
-  std::cerr << getParserName() << " error : " << text;
+  std::cerr << getParserName() << " error : ";
+  try {
+    std::cerr << text;
+  } catch(Glib::ConvertError e) {
+    std::cerr << "ConverError" << std::endl;
+  }
 }
 
 void
 GenericParser::on_fatal_error(const Glib::ustring& text) {
   std::cerr << getParserName() << " fatal error : " << text;
+  try {
+    std::cerr << text;
+  } catch (Glib::ConvertError e) {
+    std::cerr << "ConvertError" << std::endl;
+  }
 }
 

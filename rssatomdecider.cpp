@@ -52,17 +52,29 @@ RssAtomDecider::on_comment(const Glib::ustring& text) {
 
 void
 RssAtomDecider::on_warning(const Glib::ustring& text) {
-  std::cout << "Rss/Atom decider warning : " << text; // << endl;
+  try {
+    std::cerr << "Rss/Atom decider warning : " << text; // << endl;
+  } catch (Glib::ConvertError e) {
+    std::cerr << "Rss/Atom decider error on warning : " << e.what() << std::endl;
+  }
 }
 
 void
 RssAtomDecider::on_error(const Glib::ustring& text) {
-  std::cout << "Rss/Atom decider error : " << text; // << endl;
+  try {	
+    std::cerr << "Rss/Atom decider error : " << text; // << endl;
+  } catch (Glib::ConvertError e) {
+    std::cerr << "Rss/Atom decider error on error : " << e.what() << std::endl;
+  }
 }
 
 void
 RssAtomDecider::on_fatal_error(const Glib::ustring& text) {
-  std::cout << "Rss/Atom decider fatal error : " << text; // << endl;
+  try {
+    std::cerr << "Rss/Atom decider fatal error : " << text; // << endl;
+  } catch (Glib::ConvertError e) {
+    std::cerr << "Rss/Atom decider error on fatal error : " << e.what() << std::endl;
+  }
 }
 
 bool
