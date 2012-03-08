@@ -53,12 +53,12 @@ AbstractDB::~AbstractDB() {
 
 }
 
-void
+std::string
 AbstractDB::create_feed(std::string &website_id, std::string &feed_url, std::string &user) {
 
   std::string blank("");
 
-  create_feed_full(website_id, feed_url, blank, blank, blank, blank, blank, blank, user, blank, blank);
+  return create_feed_full(website_id, feed_url, blank, blank, blank, blank, blank, blank, user, blank, blank);
 }
 
 void

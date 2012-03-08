@@ -88,7 +88,7 @@ std::list<std::vector<Sqlite3Value *> > Sqlite3DB::execReturnStmt(std::string &q
   return l;
 }
 
-void Sqlite3DB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified) {
+std::string Sqlite3DB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified) {
 
   std::string query("INSERT OR IGNORE INTO sources (website_id, feed_url, title, url, descr, imgtitle, imgurl, imglink, user, etag, lastmodified) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
   std::vector<Sqlite3Value> values(11);
@@ -105,6 +105,8 @@ void Sqlite3DB::create_feed_full(std::string &website_id, std::string &feed_url,
   values[10] = Sqlite3Value(lastmodified);
 
   execNoReturnStmt(query, values, "create_feed_full()");
+
+  return website_id;
 
 }
 

@@ -15,7 +15,7 @@ class PostgresDB : public AbstractDB
     PostgresDB();
     virtual ~PostgresDB();
 
-    void create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified);
+    std::string create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified);
     std::list<struct feed *> * get_feeds();
 
     void update_timestamps_feed(std::string &website_id, std::string &etag, std::string &lastmodified);

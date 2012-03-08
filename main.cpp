@@ -105,13 +105,16 @@ print_usage() {
 }
 
 int
-update_feeds() {
+parse_feed_file() {
+  /*
+   * This has become more or less useless. Could be useful as a standard OPML reader, though.
+   */
   
   ifstream fin("feedList.ini");
-  
+
   /* Initialise database connection */
   AbstractDB * db = init_database();
-  
+
   /*
    * For each url in feedList.ini :
    *  - Check if feed url is already in the database. If not, fetch and add.
@@ -133,8 +136,19 @@ update_feeds() {
   }
   cout << "done." << endl;
 
+  delete db;
+
+  return 0;
+}
+
+int
+update_feeds() {
+  
+  /* Initialise database connection */
+  AbstractDB * db = init_database();
+
   /*
-   * Next, update the already existing feeds.
+   * Update the already existing feeds.
    */
   std::list<struct feed *> * f = db->get_feeds();
   std::list<struct feed *>::iterator it;
@@ -384,11 +398,14 @@ int list_feeds() {
 
 int add_feed(string name, string url, string user) {
 
-  ofstream fout("feedList.ini", ios_base::app);
-  
-  fout << url << " " << name << " " << user << endl;
-  fout.close();
-  
+  AbstractDB * db = init_database();
+
+  string id = db->create_feed(name, url, user);
+
+  delete db;
+
+  update_single_feed(id);
+
   return 0;
 }
 

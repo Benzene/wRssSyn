@@ -75,7 +75,7 @@ PostgresDB::init_tables() {
 
 }
 
-void
+std::string
 PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified) {
 
   /* We have to do two things:
@@ -85,9 +85,9 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
 
   pqxx::work txn(*db);
   
-  try {
+  std::string uid = "";
 
-    std::string uid = "";
+  try {
 
     std::string exist_query("SELECT website_id "
 		  "FROM sources "
@@ -121,6 +121,7 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
     txn.exec(subscr_query);
 
     txn.commit();
+
   } catch (pqxx::unique_violation const& exc) {
     /* This only means that the sources is already there. */
 //    std::cerr << "Note: source already present in database." << std::endl;
@@ -129,6 +130,8 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
     std::cerr << exc.base().what() << std::endl;
     exit(-1);
   }
+
+  return uid;
 
 }
 
