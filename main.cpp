@@ -21,6 +21,7 @@ static char errorBuffer[CURL_ERROR_SIZE];
 
 AbstractDB * init_database();
 int update_feeds();
+int update_single_feed(string id);
 int update_feed(AbstractDB * db, struct feed * f);
 int get_feed(string id);
 int list_feeds();
@@ -47,7 +48,11 @@ main (int argc, char* argv[]) {
   } else {
     string cmd(argv[1]);
     if (cmd == "update") {
-      return update_feeds();
+      if (argc < 3) {
+        return update_feeds();
+      } else {
+        return update_single_feed(argv[2]);
+      }
     } else if ( cmd == "get") {
       if (argc < 3) {
 	print_usage();
@@ -92,6 +97,7 @@ print_usage() {
     cerr << "Usage : wRssSyn <command>" << endl;
     cerr << "With <command> is one of : " << endl;
     cerr << "  update 		updates the feeds" << endl;
+    cerr << "  update <feed_id> updates a single feed" << endl;
     cerr << "  get <feed_id>	prints last entries for feed <feed_id>" << endl;
     cerr << "  list		prints the list of feeds currently registered" << endl;
     cerr << "  add <name> <url>	<user> adds an rss url to the list" << endl; 
@@ -162,6 +168,27 @@ update_feeds() {
   
   return 0;
   
+}
+
+int update_single_feed(string id) {
+
+  AbstractDB * db = init_database();
+
+  int retVal = -1;
+  // TODO: Optimize this !
+  std::list<struct feed *> * f = db->get_feeds();
+  std::list<struct feed *>::iterator it;
+  for (it = f->begin(); it != f->end(); ++it) {
+    if((*it)->id == id) {
+      retVal = update_feed(db, (*it));
+    }
+    delete (*it);
+  }
+
+  delete f;
+  delete db;
+
+  return retVal;
 }
 
 int update_feed(AbstractDB * db, struct feed * f) {
