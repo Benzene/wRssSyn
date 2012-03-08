@@ -31,7 +31,7 @@ class GenericParser : public xmlpp::SaxParser
     virtual const Glib::ustring& getUidLabel() =0;
     virtual const Glib::ustring& getParserName() =0;
 
-  private:
+  protected:
     bool in_entry;
     bool header_image;
     Glib::ustring CurrentTag;
@@ -45,6 +45,7 @@ class GenericParser : public xmlpp::SaxParser
     std::string ImgUrl;
     std::string ImgLink;
 
+  private:
     AbstractDB * db;
     std::string id;
 };

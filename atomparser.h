@@ -10,6 +10,8 @@ class AtomParser : public GenericParser
     AtomParser();
     AtomParser(AbstractDB * db, std::string id);
     virtual ~AtomParser();
+
+    void on_start_element(const Glib::ustring& name, const AttributeList& attributes);
     
   protected:
     virtual const Glib::ustring& getItemLabel() { return ItemLabel; }
