@@ -35,7 +35,7 @@ AtomParser::on_start_element(const Glib::ustring& name, const AttributeList& att
       } else if( (*it).name == "href") {
         href = (*it).value;
       } else if( (*it).name == "rel") {
-        href = (*it).value;
+        rel = (*it).value;
       }
     }
 
