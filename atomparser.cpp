@@ -41,7 +41,7 @@ AtomParser::on_start_element(const Glib::ustring& name, const AttributeList& att
 
     if (rel == "self") {
       // Url of the atom feed. -> ?
-    } else if (type == "text/html") {
+    } else if ((rel == "alternate" || rel == "") && (type == "text/html" || type == "")) {
       if (!in_entry) {
         GlobUrl = href;
       } else {
