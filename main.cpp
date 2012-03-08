@@ -404,7 +404,7 @@ int add_feed(string name, string url, string user) {
 
   delete db;
 
-  if (id != name) {
+  if (id == name) {
     update_single_feed(id);
   }
 
