@@ -51,4 +51,35 @@ AtomParser::on_start_element(const Glib::ustring& name, const AttributeList& att
   } else {
     GenericParser::on_start_element(name, attributes);
   }
+
+  if (name == "content") {
+    Glib::ustring type;
+
+    AttributeList::const_iterator it;
+    for (it = attributes.begin(); it != attributes.end(); ++it) {
+      if( (*it).name == "type") {
+        type = (*it).value;
+	break;
+      }
+    }
+    if (type == "xhtml") {
+      // Inline html. Ideally, we want to keep the contents of all the subtree as is.
+      // TODO !
+      pass_through = true;
+      return;
+    }
+  } else {
+    GenericParser::on_start_element(name, attributes);
+  }
+
+}
+
+void
+AtomParser::on_end_element(const Glib::ustring& name) {
+  
+  if (name == "content") {
+    pass_through = false;
+  }
+
+  GenericParser::on_end_element(name);
 }

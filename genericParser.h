@@ -34,6 +34,7 @@ class GenericParser : public xmlpp::SaxParser
   protected:
     bool in_entry;
     bool header_image;
+    bool pass_through;
     Glib::ustring CurrentTag;
 
     Entry * CurrentEntry;

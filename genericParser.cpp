@@ -6,7 +6,8 @@
 GenericParser::GenericParser() : 
   xmlpp::SaxParser(),
   in_entry(false),
-  header_image(false) 
+  header_image(false), 
+  pass_through(false)
 {
 }
 
@@ -15,7 +16,8 @@ GenericParser::GenericParser(AbstractDB * db, std::string id) :
   in_entry(false),
   db(db),
   id(id),
-  header_image(false)
+  header_image(false),
+  pass_through(false)
 {
 }
 
@@ -48,28 +50,39 @@ void
 GenericParser::on_start_element(const Glib::ustring& name,
 		const AttributeList& attributes) {
 
-  CurrentTag = name;
+  if(pass_through) {
+	  // TODO
 
-  if (name == getItemLabel()) {
-    in_entry = true;
-    CurrentEntry = new Entry();
-  } else if (!in_entry && name == "image") {
-    header_image = true;
+  } else {
+
+    CurrentTag = name;
+
+    if (name == getItemLabel()) {
+      in_entry = true;
+      CurrentEntry = new Entry();
+    } else if (!in_entry && name == "image") {
+      header_image = true;
+    }
   }
 }
 
 void
 GenericParser::on_end_element(const Glib::ustring& name) {
 
-  CurrentTag = "";
+  if(pass_through) {
+	  // TODO
 
-  if (name == getItemLabel()) {
-    db->insert_entry(id, *CurrentEntry);
-    delete CurrentEntry;
+  } else {
+    CurrentTag = "";
 
-    in_entry = false;
-  } else if (!in_entry && name == "image") {
-    header_image = false;
+    if (name == getItemLabel()) {
+      db->insert_entry(id, *CurrentEntry);
+      delete CurrentEntry;
+
+      in_entry = false;
+    } else if (!in_entry && name == "image") {
+      header_image = false;
+    }
   }
 }
 
