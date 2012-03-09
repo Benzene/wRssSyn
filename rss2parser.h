@@ -18,6 +18,8 @@ class RssParser : public GenericParser
     virtual const Glib::ustring& getUidLabel() { return UidLabel; }
     virtual const Glib::ustring& getParserName() { return ParserName; }
 
+    void on_cdata_block(const Glib::ustring& text);
+
   private:
     static const Glib::ustring ItemLabel;
     static const Glib::ustring ContentLabel;
