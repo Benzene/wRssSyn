@@ -13,15 +13,15 @@ class RssParser : public GenericParser
     
   protected:
     virtual const Glib::ustring& getItemLabel() { return ItemLabel; }
+    virtual const Glib::ustring& getSummaryLabel() { return SummaryLabel; }
     virtual const Glib::ustring& getContentLabel() { return ContentLabel; }
     virtual const Glib::ustring& getPubDateLabel() { return PubDateLabel; }
     virtual const Glib::ustring& getUidLabel() { return UidLabel; }
     virtual const Glib::ustring& getParserName() { return ParserName; }
 
-    void on_cdata_block(const Glib::ustring& text);
-
   private:
     static const Glib::ustring ItemLabel;
+    static const Glib::ustring SummaryLabel;
     static const Glib::ustring ContentLabel;
     static const Glib::ustring PubDateLabel;
     static const Glib::ustring UidLabel;

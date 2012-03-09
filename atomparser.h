@@ -13,10 +13,10 @@ class AtomParser : public GenericParser
 
     void on_start_element(const Glib::ustring& name, const AttributeList& attributes);
     void on_end_element(const Glib::ustring& name);
-    void on_characters(const Glib::ustring& text);
     
   protected:
     virtual const Glib::ustring& getItemLabel() { return ItemLabel; }
+    virtual const Glib::ustring& getSummaryLabel() { return SummaryLabel; }
     virtual const Glib::ustring& getContentLabel() { return ContentLabel; }
     virtual const Glib::ustring& getPubDateLabel() { return PubDateLabel; }
     virtual const Glib::ustring& getUidLabel() { return UidLabel; }
@@ -24,6 +24,7 @@ class AtomParser : public GenericParser
     
   private:
     static const Glib::ustring ItemLabel;
+    static const Glib::ustring SummaryLabel;
     static const Glib::ustring ContentLabel;
     static const Glib::ustring PubDateLabel;
     static const Glib::ustring UidLabel;

@@ -26,6 +26,7 @@ class GenericParser : public xmlpp::SaxParser
     virtual void on_fatal_error(const Glib::ustring& text);
 
     virtual const Glib::ustring& getItemLabel() =0;
+    virtual const Glib::ustring& getSummaryLabel() =0;
     virtual const Glib::ustring& getContentLabel() =0;
     virtual const Glib::ustring& getPubDateLabel() =0;
     virtual const Glib::ustring& getUidLabel() =0;

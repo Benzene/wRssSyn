@@ -116,6 +116,8 @@ GenericParser::on_characters(const Glib::ustring& text) {
       CurrentEntry->title += text;
     } else if (CurrentTag == "link") {
       CurrentEntry->link += text;
+    } else if (CurrentTag == getSummaryLabel()) {
+      CurrentEntry->summary += text;
     } else if (CurrentTag == getContentLabel()) {
       CurrentEntry->description += text;
     } else if (CurrentTag == getPubDateLabel()) {
