@@ -7,13 +7,14 @@ Entry::Entry() {
   
 }
 
-Entry::Entry(string id, string title, string link, time_t date, string description) {
-  this->id = id;
-  this->title = title;
-  this->link = link;
-  string strdate(asctime(localtime(&date)));
-  this->date = strdate;
-  this->description = description;
+Entry::Entry(string id, string title, string link, time_t date, string description) :
+  id(id),
+  title(title),
+  link(link),
+  date(asctime(localtime(&date))),
+  summary(""),
+  description(description)
+{
 }
 
 Entry::~Entry() {
@@ -26,6 +27,7 @@ Entry::print() {
   cout << "Title : " << title << endl;
   cout << "Url : " << link << endl;
   cout << "Date : " << date << endl;
+  cout << "Summary : " << summary << endl;
   cout << "Description : " << description << endl;
 }
 

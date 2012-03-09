@@ -1,5 +1,8 @@
 #include "atomparser.h"
 
+#include <glibmm/convert.h>
+#include <iostream>
+
 const Glib::ustring AtomParser::ItemLabel = "entry";
 const Glib::ustring AtomParser::ContentLabel = "content";
 const Glib::ustring AtomParser::PubDateLabel = "published";
@@ -83,3 +86,17 @@ AtomParser::on_end_element(const Glib::ustring& name) {
 
   GenericParser::on_end_element(name);
 }
+
+void
+AtomParser::on_characters(const Glib::ustring& text) {
+  if (in_entry && CurrentTag == "summary") {
+    try {
+      CurrentEntry->summary += text;
+    } catch (Glib::ConvertError e) {
+      std::cerr << "Parsing error." << std::endl;
+    }
+  } else {
+    GenericParser::on_characters(text);
+  }
+}
+

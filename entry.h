@@ -9,6 +9,7 @@ class Entry {
   public:
     std::string title;
     std::string link;
+    std::string summary;
     std::string description;
     std::string id;
     std::string date;

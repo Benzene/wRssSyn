@@ -70,6 +70,13 @@ AbstractDB::insert_entry(std::string &website_id, Entry &entry) {
     uid = &(entry.id);
   }
 
+  std::string * descr = NULL;
+  if (entry.description == "") {
+    descr = &(entry.summary);
+  } else {
+    descr = &(entry.description);
+  }
+
   time_t ret = TimeHelpers::parseXMLtime(entry.date);
 
   insert_entry(website_id, *uid, entry.title, entry.link, ret, entry.description, glob_login);
