@@ -65,6 +65,11 @@ PostgresDB::init_tables() {
   		  "PRIMARY KEY (\"user\", post_id))");
     txn.exec(qFavorites);
 
+    std::string qDisabled("CREATE TABLE IF NOT EXISTS disabled "
+            "(sources_id TEXT REFERENCES sources (website_id), "
+            "PRIMARY KEY (sources_id)");
+    txn.exec(qDisabled);
+
     txn.commit();
 
   } catch (pqxx::pqxx_exception const& exc) {
@@ -143,7 +148,7 @@ PostgresDB::get_feeds() {
 
   try {
     pqxx::result r = txn.exec(
-		  "SELECT website_id, feed_url, title, etag, lastmodified FROM sources");
+		  "SELECT website_id, feed_url, title, etag, lastmodified FROM sources WHERE website_id NOT IN (SELECT website_id FROM disabled)");
     txn.commit();
 
     std::cout << r.size() << " feeds found in database." << std::endl;
