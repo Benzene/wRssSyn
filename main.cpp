@@ -188,20 +188,16 @@ int update_single_feed(string id) {
   AbstractDB * db = init_database();
 
   int retVal = -1;
-  // TODO: Optimize this !
-  std::list<struct feed *> * f = db->get_feeds();
-  std::list<struct feed *>::iterator it;
-  for (it = f->begin(); it != f->end(); ++it) {
-    if((*it)->id == id) {
-      retVal = update_feed(db, (*it), true);
-    }
-    delete (*it);
+  struct feed * f= db->get_feed_by_id(id);
+  if (f != NULL) {
+    retVal = update_feed(db, f, true);
+    delete f;
   }
 
-  delete f;
   delete db;
 
   return retVal;
+
 }
 
 int update_feed(AbstractDB * db, struct feed * f, bool force) {

@@ -172,6 +172,43 @@ PostgresDB::get_feeds() {
 
 }
 
+struct feed *
+PostgresDB::get_feed_by_id(std::string &id) {
+  pqxx::work txn(*db);
+
+  try {
+    pqxx::result r = txn.exec(
+          "SELECT website_id, feed_url, title, etag, lastmodified FROM sources WHERE website_id = "   
+          + txn.quote(id));
+    txn.commit();
+
+    if (r.size() == 0) {
+        // Not found
+        std::cout << "Feed " << id << " not found.";
+        return NULL;
+    } else {
+        if (r.size() > 1) {
+        // Multiple matches
+        std::cout << "More than one match for id " << id << ". This shouldn't happen.";
+        }
+        struct feed * f = new struct feed;
+        f->id = r[0]["website_id"].as<std::string>();
+        f->feed_url = r[0]["feed_url"].as<std::string>();
+        f->title = r[0]["title"].as<std::string>();
+        f->etag = r[0]["etag"].as<std::string>();
+        f->lastmodified = r[0]["lastmodified"].as<std::string>();
+
+        return f;
+    }
+  } catch (pqxx::pqxx_exception const& exc) {
+    std::cerr << "Exception while getting a feed !" << std::endl;
+    std::cerr << exc.base().what() << std::endl;
+    exit(-1);
+  }
+
+}
+
+
 void
 PostgresDB::update_timestamps_feed(std::string &website_id, std::string &etag, std::string &lastmodified) {
   pqxx::work txn(*db);
