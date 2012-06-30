@@ -4,7 +4,6 @@
 #include <ctime>
 #include <curl/curl.h>
 #include "db.h"
-#include "sqlite3db.h"
 #include "postgresdb.h"
 #include "feed.h"
 #include "auth.h"
@@ -428,11 +427,7 @@ int update_feed_url(string name, string newurl) {
 AbstractDB * 
 init_database() {
   
-  if (use_postgres) {
-    PostgresDB * db = new PostgresDB();
-    db->init_tables();
-    return db;
-  } else {
-    return new Sqlite3DB();
-  }
+  PostgresDB * db = new PostgresDB();
+  db->init_tables();
+  return db;
 }

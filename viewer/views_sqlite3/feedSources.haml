@@ -1,9 +1,0 @@
-%ul
-  - @sources.each do |source|
-    %li
-      <a class="internal" href="#{url(source[0])}" title="#{source[1]}">#{source[1]}</a> (<a href="#{source[2]}" title="#{source[2]}">#{source[2]}</a>) : #{source[3]}
-      - if source[4] != nil
-        %a.internal#has_new_posts{:href => url("new/#{source[0]}"), :title => "New posts for #{source[1]}"}
-          (#{source[4]} new posts)
-      - else
-        (No new posts)  	

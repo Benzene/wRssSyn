@@ -26,6 +26,6 @@ link_directories(${PostgreSQL_LIBRARY_DIR})
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_executable (wRssSyn main.cpp rss2parser.cpp atomparser.cpp genericParser.cpp rssatomdecider.cpp tumblrparser.cpp tumblr.cpp tumblr_entry.cpp entry.cpp time_helpers.cpp auth.cpp db.cpp sqlite3db.cpp postgresdb.cpp curl_helpers.cpp)
+add_executable (wRssSyn main.cpp rss2parser.cpp atomparser.cpp genericParser.cpp rssatomdecider.cpp tumblrparser.cpp tumblr.cpp tumblr_entry.cpp entry.cpp time_helpers.cpp auth.cpp db.cpp postgresdb.cpp curl_helpers.cpp)
 target_link_libraries(wRssSyn ${LIBS})
 
