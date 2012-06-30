@@ -285,6 +285,8 @@ int update_feed(AbstractDB * db, struct feed * f, bool force) {
       preparser.parse_memory(*target);
     } catch(xmlpp::parse_error e) {
       std::cerr << "Preparsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
+      std::cerr << "Document contains:" << std::endl;
+      std::cerr << *target << std::endl;
       return 6;
     }
     if (preparser.is_rss2()) {
