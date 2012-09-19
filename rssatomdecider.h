@@ -2,7 +2,6 @@
 #define MR_0710_RSSATOMDECIDER
 
 #include <libxml++/libxml++.h>
-#include <sqlite3.h>
 #include "entry.h"
 
 class RssAtomDecider : public xmlpp::SaxParser
