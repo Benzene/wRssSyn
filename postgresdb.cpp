@@ -267,7 +267,7 @@ PostgresDB::update_feed_url(std::string &website_id, std::string &feed_url) {
 }
 
 void
-PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user) {
+PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr) {
   pqxx::work txn(*db);
   std::string d = TimeHelpers::getPGREInput(date);
   std::string query("INSERT INTO posts "

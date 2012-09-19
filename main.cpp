@@ -10,8 +10,8 @@
 #include "rss2parser.h"
 #include "atomparser.h"
 #include "rssatomdecider.h"
-#include "tumblr.h"
-#include "tumblrparser.h"
+//#include "tumblr.h"
+//#include "tumblrparser.h"
 #include "curl_helpers.h"
 
 using namespace std;
@@ -164,6 +164,7 @@ update_feeds() {
    * Finally, parse the special purpose feeds.
    * Only tumblr is in there, for now.
    */
+  /*
   std::string * target = update_tumblr_feeds(db);
   if (target != NULL) {
     TumblrParser parser(db);
@@ -176,6 +177,7 @@ update_feeds() {
 
     delete target;
   }
+  */
 
   delete db;
   

@@ -24,7 +24,7 @@ class PostgresDB : public AbstractDB
 
     void update_feed_url(std::string &website_id, std::string &title);
 
-    void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user);
+    void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr);
     std::list<Entry> get_entries(std::string &website_id, int num);
 
     void init_tables();

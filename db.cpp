@@ -79,12 +79,14 @@ AbstractDB::insert_entry(std::string &website_id, Entry &entry) {
 
   time_t ret = TimeHelpers::parseXMLtime(entry.date);
 
-  insert_entry(website_id, *uid, entry.title, entry.link, ret, *descr, glob_login);
+  insert_entry(website_id, *uid, entry.title, entry.link, ret, *descr);
 }
 
+/*
 void
 AbstractDB::insert_entry(std::string &website_id, TumblrEntry &entry) {
   entry.description = entry.build_content();
 
   insert_entry(website_id, (Entry&)entry);
 }
+*/

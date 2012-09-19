@@ -61,7 +61,7 @@ class AbstractDB
 
     /* Insert an entry in the db */
     void insert_entry(std::string &website_id, Entry &entry);
-    void insert_entry(std::string &website_id, TumblrEntry &entry);
+    //void insert_entry(std::string &website_id, TumblrEntry &entry);
 
     /* List existing entries */
     virtual std::list<Entry> get_entries(std::string &website_id, int num) =0;
@@ -70,7 +70,7 @@ class AbstractDB
   protected:
     /* Insert an entry (this function is the ones that has to be
      * overriden) */
-    virtual void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr, std::string &user) =0;
+    virtual void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr) =0;
 };
 
 #endif
