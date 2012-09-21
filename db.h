@@ -66,6 +66,9 @@ class AbstractDB
     /* List existing entries */
     virtual std::list<Entry> get_entries(std::string &website_id, int num) =0;
 
+    /* Add user */
+    virtual void add_user(std::string &user) =0;
+
 
   protected:
     /* Insert an entry (this function is the ones that has to be

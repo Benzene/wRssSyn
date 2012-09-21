@@ -27,6 +27,8 @@ class PostgresDB : public AbstractDB
     void insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr);
     std::list<Entry> get_entries(std::string &website_id, int num);
 
+    void add_user(std::string &user);
+
     void init_tables();
 
   private:

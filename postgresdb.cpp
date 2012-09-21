@@ -2,10 +2,16 @@
 #include <iostream>
 #include <cstdlib>
 #include "time_helpers.h"
+#include "config.h"
 
 PostgresDB::PostgresDB() {
   /* Open the connection the database. */
-  db = new pqxx::connection("dbname=wrsssyn user=wrsssyn");
+    try {
+        db = new pqxx::connection("dbname=" + Config::get_instance()->val("db_name") + " user=" + Config::get_instance()->val("db_user"));
+    } catch (pqxx::pqxx_exception const& exc) {
+        std::cerr << "Connection to database failed ! Check your parameters !" << std::endl;
+        exit(-1);
+    }
 
 }
 
@@ -41,10 +47,13 @@ PostgresDB::init_tables() {
     txn.exec(qPosts);
 
     std::string qUsers("CREATE TABLE IF NOT EXISTS users "
-		  "(login TEXT PRIMARY KEY, "
+          "(uid SERIAL PRIMARY KEY, "
+		  "login TEXT NOT NULL UNIQUE)");
+    /*
 		  "pass TEXT NOT NULL, "
 		  "tumblr_email TEXT, "
 		  "tumblr_pass TEXT)");
+          */
     txn.exec(qUsers);
 
     std::string qReads("CREATE TABLE IF NOT EXISTS readeds "
@@ -329,4 +338,23 @@ PostgresDB::get_entries(std::string &website_id, int num) {
   return l;
 
 }
+
+void
+PostgresDB::add_user(std::string &user) {
+    pqxx::work txn(*db);
+
+    std::string query("INSERT INTO users (login) "
+        "VALUES (" + txn.quote(user) + ")");
+
+  try {
+    txn.exec(query);
+    txn.commit();
+  } catch (pqxx::pqxx_exception const& exc) {
+    std::cerr << "Exception while inserting entry !" << std::endl;
+    std::cerr << exc.base().what() << std::endl;
+    exit(-1);
+  }
+
+}
+
 

@@ -6,13 +6,14 @@
 #include "db.h"
 #include "postgresdb.h"
 #include "feed.h"
-#include "auth.h"
 #include "rss2parser.h"
 #include "atomparser.h"
 #include "rssatomdecider.h"
 //#include "tumblr.h"
 //#include "tumblrparser.h"
 #include "curl_helpers.h"
+
+#include "config.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ int get_feed(string id);
 int list_feeds();
 int add_feed(string name, string url, string user);
 int update_feed_url(string name, string newurl);
+int add_user(string login);
 
 void print_usage();
 
@@ -40,6 +42,8 @@ main (int argc, char* argv[]) {
   
   // Supposed to make the encoding right..
   std::locale::global(std::locale(""));
+
+  //std::cout << "Useragent will be: " << Config::get_instance()->val("useragent") << std::endl;
   
   if (argc < 2) {
     print_usage();
@@ -78,8 +82,16 @@ main (int argc, char* argv[]) {
 	return 1;
       } else {
         string name(argv[2]);
-	string url(argv[3]);
-	return update_feed_url(name,url);
+	    string url(argv[3]);
+	    return update_feed_url(name,url);
+      }
+    } else if ( cmd == "useradd") {
+      if (argc < 3) {
+        print_usage();
+        return 1;
+      } else {
+        string user(argv[2]);
+        return add_user(user);
       }
     } else {
       print_usage();
@@ -101,6 +113,7 @@ print_usage() {
     cerr << "  list		prints the list of feeds currently registered" << endl;
     cerr << "  add <name> <url>	<user> adds an rss url to the list" << endl; 
     cerr << "  update_url <name> <new_url> updates the url of a feed" << endl;
+    cerr << "  useradd <user> creates a new user" << endl;
 }
 
 int
@@ -229,7 +242,7 @@ int update_feed(AbstractDB * db, struct feed * f, bool force) {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, store_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, target);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, useragent.c_str());
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, Config::get_instance()->val("useragent").c_str());
       
     /* Set the custom headers */
     struct curl_slist * slist = NULL;
@@ -414,6 +427,14 @@ int update_feed_url(string name, string newurl) {
   AbstractDB * db = init_database();
 
   db->update_feed_url(name, newurl);
+
+  return 0;
+}
+
+int add_user(string login) {
+  AbstractDB * db = init_database();
+
+  db->add_user(login);
 
   return 0;
 }

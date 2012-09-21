@@ -1,5 +1,4 @@
 #include "db.h"
-#include "auth.h"
 #include "time_helpers.h"
 #include <iostream>
 #include <cstdlib>
