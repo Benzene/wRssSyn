@@ -162,7 +162,7 @@ PostgresDB::get_feeds() {
 
     std::cout << r.size() << " feeds found in database." << std::endl;
 
-    for(int i = 0; i < r.size(); ++i) {
+    for(pqxx::result::size_type i = 0; i < r.size(); ++i) {
       struct feed * f = new struct feed;
       f->id = r[i]["website_id"].as<std::string>();
       f->feed_url = r[i]["feed_url"].as<std::string>();
@@ -318,7 +318,7 @@ PostgresDB::get_entries(std::string &website_id, int num) {
 
     std::cout << r.size() << " entries found for feed " << website_id << std::endl;
 
-    for (int i = 0; i < r.size(); ++i) {
+    for (pqxx::result::size_type i = 0; i < r.size(); ++i) {
       std::string date = r[i][3].as<std::string>();
       int date_i = TimeHelpers::stampFromPGRE(date);
 
