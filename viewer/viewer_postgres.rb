@@ -1,7 +1,9 @@
+#!/usr/bin/env ruby
+
 require 'sinatra'
 require 'rubygems'
 require 'pg'
-require_relative 'login-commons/loginHandler'
+require_relative 'login-commons/loginHandler_pg'
 
 before do
 	@db = PGconn.open(:dbname => 'wrsssyn', :user => 'wrsssyn')
