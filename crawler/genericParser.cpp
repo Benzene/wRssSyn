@@ -48,7 +48,7 @@ GenericParser::on_end_document() {
 
 void
 GenericParser::on_start_element(const Glib::ustring& name,
-		const AttributeList& attributes) {
+		const AttributeList&) {
 
   if(pass_through) {
 	  // TODO
@@ -138,7 +138,7 @@ GenericParser::on_cdata_block(const Glib::ustring& text) {
 }
 
 void
-GenericParser::on_comment(const Glib::ustring& text) {
+GenericParser::on_comment(const Glib::ustring&) {
 }
 
 void

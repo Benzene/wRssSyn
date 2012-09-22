@@ -25,7 +25,7 @@ set(LIBS ${LIBS} ${PostgreSQL_LIBRARIES})
 link_directories(${PostgreSQL_LIBRARY_DIR})
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -pedantic-errors -Wextra --std=c++0x")
 
 add_subdirectory(crawler)
 #add_executable (wRssSyn main.cpp rss2parser.cpp atomparser.cpp genericParser.cpp rssatomdecider.cpp entry.cpp time_helpers.cpp db.cpp postgresdb.cpp curl_helpers.cpp genericConfig.cpp config.cpp)

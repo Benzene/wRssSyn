@@ -26,7 +26,7 @@ RssAtomDecider::on_end_document() {
 
 void
 RssAtomDecider::on_start_element(const Glib::ustring& name,
-			    const AttributeList& attributes) {  
+			    const AttributeList&) {  
 
   if (name == "rss") {
     feed_type = 0;
@@ -36,17 +36,17 @@ RssAtomDecider::on_start_element(const Glib::ustring& name,
 }
 
 void
-RssAtomDecider::on_end_element(const Glib::ustring& name) {
+RssAtomDecider::on_end_element(const Glib::ustring&) {
   
 }
 
 void
-RssAtomDecider::on_characters(const Glib::ustring& text) {
+RssAtomDecider::on_characters(const Glib::ustring&) {
 
 }
 
 void
-RssAtomDecider::on_comment(const Glib::ustring& text) {
+RssAtomDecider::on_comment(const Glib::ustring&) {
 //  std::cout << "Comments : " << text << endl;
 }
 

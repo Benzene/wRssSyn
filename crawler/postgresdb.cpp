@@ -90,7 +90,7 @@ PostgresDB::init_tables() {
 }
 
 std::string
-PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink, std::string &user, std::string &etag, std::string &lastmodified) {
+PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string&, std::string&, std::string&, std::string &user, std::string &etag, std::string &lastmodified) {
 
   /* We have to do two things:
    * - create the feed, if we don't already have it.
@@ -239,7 +239,7 @@ PostgresDB::update_timestamps_feed(std::string &website_id, std::string &etag, s
 }
 
 void
-PostgresDB::update_metadata_feed(std::string &website_id, std::string &title, std::string &url, std::string &descr, std::string &imgtitle, std::string &imgurl, std::string &imglink) {
+PostgresDB::update_metadata_feed(std::string &website_id, std::string &title, std::string &url, std::string &descr, std::string&, std::string&, std::string&) {
   pqxx::work txn(*db);
   std::string query("UPDATE sources SET "
 		  "title=" + txn.quote(title) + ", "
