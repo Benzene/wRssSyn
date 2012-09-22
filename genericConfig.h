@@ -8,12 +8,10 @@ class GenericConfig {
 
     public:
         GenericConfig(std::map<std::string, std::string> default_values);
-        GenericConfig(std::map<std::string, std::string> default_values, std::string filename);
-        std::string val(std::string key);
+        void read_config(const std::string& filename);
+        std::string val(const std::string& key);
 
     private:
-
-        void setup_defaults(std::map<std::string, std::string> default_values);
 
         std::map<std::string, std::string> values;
 

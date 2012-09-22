@@ -3,15 +3,9 @@
 #include <fstream>
 #include <iostream>
 
-GenericConfig::GenericConfig(std::map<std::string, std::string> default_values) {
-    
-    setup_defaults(default_values);
+GenericConfig::GenericConfig(std::map<std::string, std::string> default_values) : values(default_values) { }
 
-}
-
-GenericConfig::GenericConfig(std::map<std::string, std::string> default_values, std::string filename) {
-
-    setup_defaults(default_values);
+void GenericConfig::read_config(const std::string& filename) {
 
     std::ifstream fin(filename.c_str());
 
@@ -42,13 +36,7 @@ GenericConfig::GenericConfig(std::map<std::string, std::string> default_values, 
     }
 }
 
-void GenericConfig::setup_defaults(const std::map<std::string, std::string> default_values) {
-
-    this->values = default_values;
-
-}
-
-std::string GenericConfig::val(std::string key) {
+std::string GenericConfig::val(const std::string& key) {
 
     std::map<std::string, std::string>::const_iterator it = this->values.find(key);
 
@@ -69,6 +57,7 @@ std::string GenericConfig::trim_whitespace(std::string s) {
             return s.substr(begin, end-begin+1);
         } else {
             std::cerr << "Unreachable branch reached in trim_whitespace. You shouldn't be there." << std::endl;
+            exit(-1);
         }
     } else {
         return "";
