@@ -7,12 +7,12 @@
 class Entry {
   
   public:
+    std::string id;
     std::string title;
     std::string link;
+    std::string date;
     std::string summary;
     std::string description;
-    std::string id;
-    std::string date;
     
     Entry();
     Entry(std::string id, std::string title, 

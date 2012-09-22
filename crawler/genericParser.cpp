@@ -14,10 +14,10 @@ GenericParser::GenericParser() :
 GenericParser::GenericParser(AbstractDB * db, std::string id) : 
   xmlpp::SaxParser(),
   in_entry(false),
-  db(db),
-  id(id),
   header_image(false),
-  pass_through(false)
+  pass_through(false),
+  db(db),
+  id(id)
 {
 }
 
