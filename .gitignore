@@ -2,6 +2,7 @@
 *.o
 *.xml
 *.core
+*.tar.gz
 feeds.db
 wRssSyn
 CMakeCache.txt
