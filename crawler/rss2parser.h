@@ -8,7 +8,7 @@ class RssParser : public GenericParser
 {
   public:
     RssParser();
-    RssParser(AbstractDB * db, std::string id);
+    RssParser(AbstractDB * db, int id);
     virtual ~RssParser();
     
   protected:

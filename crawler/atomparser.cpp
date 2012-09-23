@@ -15,7 +15,7 @@ AtomParser::AtomParser() :
 {
 }
 
-AtomParser::AtomParser(AbstractDB * db, std::string id) : 
+AtomParser::AtomParser(AbstractDB * db, int id) : 
   GenericParser(db, id)
 {
 }

@@ -8,7 +8,7 @@ class AtomParser : public GenericParser
 {
   public:
     AtomParser();
-    AtomParser(AbstractDB * db, std::string id);
+    AtomParser(AbstractDB * db, int id);
     virtual ~AtomParser();
 
     void on_start_element(const Glib::ustring& name, const AttributeList& attributes);

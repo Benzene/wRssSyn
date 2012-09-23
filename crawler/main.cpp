@@ -12,6 +12,7 @@
 //#include "tumblr.h"
 //#include "tumblrparser.h"
 #include "curl_helpers.h"
+#include "time_helpers.h"
 
 #include "config.h"
 
@@ -21,12 +22,12 @@ static char errorBuffer[CURL_ERROR_SIZE];
 
 AbstractDB * init_database();
 int update_feeds();
-int update_single_feed(string id);
+int update_single_feed(int id);
 int update_feed(AbstractDB * db, struct feed * f, bool force);
-int get_feed(string id);
+int get_feed(int id);
 int list_feeds();
-int add_feed(string name, string url, string user);
-int update_feed_url(string name, string newurl);
+int add_feed(string url, string user);
+int update_feed_url(int id, string newurl);
 int add_user(string login);
 
 void print_usage();
@@ -54,36 +55,32 @@ main (int argc, char* argv[]) {
       if (argc < 3) {
         return update_feeds();
       } else {
-        return update_single_feed(argv[2]);
+        return update_single_feed(TimeHelpers::str2int(argv[2]));
       }
     } else if ( cmd == "get") {
       if (argc < 3) {
 	print_usage();
 	return 1;
       } else {
-	string id(argv[2]);
-	return get_feed(id);
+	return get_feed(TimeHelpers::str2int(argv[2]));
       }
     } else if ( cmd == "list") {
       return list_feeds();
     } else if ( cmd == "add") {
-      if (argc < 5) {
+      if (argc < 4) {
 	print_usage();
 	return 1;
       } else {
-	string name(argv[2]);
-	string url(argv[3]);
-	string user(argv[4]);
-	return add_feed(name,url,user);
+	string url(argv[2]);
+	string user(argv[3]);
+	return add_feed(url,user);
       }
     } else if ( cmd == "update_url") {
       if (argc < 4) {
         print_usage();
 	return 1;
       } else {
-        string name(argv[2]);
-	    string url(argv[3]);
-	    return update_feed_url(name,url);
+	    return update_feed_url(TimeHelpers::str2int(argv[2]),argv[3]);
       }
     } else if ( cmd == "useradd") {
       if (argc < 3) {
@@ -111,8 +108,8 @@ print_usage() {
     cerr << "  update <feed_id> updates a single feed" << endl;
     cerr << "  get <feed_id>	prints last entries for feed <feed_id>" << endl;
     cerr << "  list		prints the list of feeds currently registered" << endl;
-    cerr << "  add <name> <url>	<user> adds an rss url to the list" << endl; 
-    cerr << "  update_url <name> <new_url> updates the url of a feed" << endl;
+    cerr << "  add <url> <user> adds an rss url to the list" << endl; 
+    cerr << "  update_url <feed_id> <new_url> updates the url of a feed" << endl;
     cerr << "  useradd <user> creates a new user" << endl;
 }
 
@@ -144,7 +141,7 @@ parse_feed_file() {
       break;
     }
 
-    db->create_feed(id, url, user);
+    db->create_feed(FEED_RSS, url, user);
   }
   cout << "done." << endl;
 
@@ -198,7 +195,7 @@ update_feeds() {
   
 }
 
-int update_single_feed(string id) {
+int update_single_feed(int id) {
 
   AbstractDB * db = init_database();
 
@@ -217,7 +214,7 @@ int update_single_feed(string id) {
 
 int update_feed(AbstractDB * db, struct feed * f, bool force) {
 
-  std::string &id = f->id;
+  int uid = f->uid;
   std::string &url = f->feed_url;
   std::string &etag = f->etag;
   std::string &lastmodified = f->lastmodified;
@@ -286,7 +283,7 @@ int update_feed(AbstractDB * db, struct feed * f, bool force) {
     }
     curl_easy_cleanup(curl);
     
-    cout << "Updating " << id << " (" << url << ")" << endl;
+    cout << "Updating " << uid << " (" << url << ")" << endl;
 
     RssAtomDecider preparser;
     // Convert html entities to normal characters
@@ -294,29 +291,29 @@ int update_feed(AbstractDB * db, struct feed * f, bool force) {
     try {
       preparser.parse_memory(*target);
     } catch(xmlpp::parse_error e) {
-      std::cerr << "Preparsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
+      std::cerr << "Preparsing error while parsing " << uid << " (" << url << "): " << e.what() << std::endl;
       std::cerr << "Document contains:" << std::endl;
       std::cerr << *target << std::endl;
       return 6;
     }
     if (preparser.is_rss2()) {
       cout << "(Rss feed)";
-      RssParser parser(db, id);
+      RssParser parser(db, uid);
       parser.set_substitute_entities(true);
       try {
 	parser.parse_memory(*target);
       } catch(xmlpp::parse_error e) {
-	std::cerr << "Parsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
+	std::cerr << "Parsing error while parsing " << uid << " (" << url << "): " << e.what() << std::endl;
 	return 6;
       }
     } else if (preparser.is_atom()) {
       cout << "(Atom feed)";
-      AtomParser parser(db,id);
+      AtomParser parser(db, uid);
       parser.set_substitute_entities(true);
       try {
 	parser.parse_memory(*target);
       } catch(xmlpp::parse_error e) {
-        std::cerr << "Parsing error while parsing " << id << " (" << url << "): " << e.what() << std::endl;
+        std::cerr << "Parsing error while parsing " << uid << " (" << url << "): " << e.what() << std::endl;
 	return 6;
       }
     }
@@ -327,7 +324,7 @@ int update_feed(AbstractDB * db, struct feed * f, bool force) {
      * Finally, update etag and lastmodified.
      * It could be done earlier, but we would have no assurance that everything went right, and that we indeed updated. Better to do it that way.
      */
-    db->update_timestamps_feed(id, *(headersRecipient->etag), *(headersRecipient->lastmodified));
+    db->update_timestamps_feed(uid, *(headersRecipient->etag), *(headersRecipient->lastmodified));
 
     delete headersRecipient->etag;
     delete headersRecipient->lastmodified;
@@ -371,7 +368,7 @@ size_t parse_header(void * ptr, size_t size, size_t nmemb, void * userdata) {
 }
 
 int
-get_feed(string id) {
+get_feed(int id) {
 
   AbstractDB * db = init_database();
 
@@ -395,7 +392,7 @@ int list_feeds() {
 
   std::list<struct feed *>::iterator it;
   for (it = feeds->begin(); it != feeds->end(); ++it) {
-    cout << " * " << (*it)->id;
+    cout << " * " << (*it)->uid;
     cout << ": " << (*it)->feed_url;
     cout << " (" << (*it)->title;
     cout << ")" << endl;
@@ -408,25 +405,25 @@ int list_feeds() {
   return 0;
 }
 
-int add_feed(string name, string url, string user) {
+int add_feed(string url, string user) {
 
   AbstractDB * db = init_database();
 
-  string id = db->create_feed(name, url, user);
+  int id = db->create_feed(FEED_RSS, url, user);
 
   delete db;
 
-  if (id == name) {
+  if (id != -1) {
     update_single_feed(id);
   }
 
   return 0;
 }
 
-int update_feed_url(string name, string newurl) {
+int update_feed_url(int id, string newurl) {
   AbstractDB * db = init_database();
 
-  db->update_feed_url(name, newurl);
+  db->update_feed_url(id, newurl);
 
   return 0;
 }

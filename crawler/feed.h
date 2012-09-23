@@ -3,10 +3,15 @@
 
 #include <string>
 
+enum feed_type { FEED_UNK, FEED_RSS, FEED_TUMBLR };
+
 struct feed {
-  std::string id;
+  int uid;
+  feed_type type;
   std::string feed_url;
   std::string title;
+  std::string url;
+  std::string descr;
   std::string etag;
   std::string lastmodified;
 };

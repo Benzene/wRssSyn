@@ -11,7 +11,7 @@ GenericParser::GenericParser() :
 {
 }
 
-GenericParser::GenericParser(AbstractDB * db, std::string id) : 
+GenericParser::GenericParser(AbstractDB * db, int id) : 
   xmlpp::SaxParser(),
   in_entry(false),
   header_image(false),

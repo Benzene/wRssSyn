@@ -9,7 +9,7 @@ class GenericParser : public xmlpp::SaxParser
 {
   public:
     GenericParser();
-    GenericParser(AbstractDB * db, std::string id);
+    GenericParser(AbstractDB * db, int id);
     virtual ~GenericParser();
 
   protected:
@@ -49,7 +49,7 @@ class GenericParser : public xmlpp::SaxParser
 
   private:
     AbstractDB * db;
-    std::string id;
+    int id;
 };
 
 #endif

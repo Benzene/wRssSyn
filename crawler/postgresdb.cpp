@@ -24,26 +24,39 @@ void
 PostgresDB::init_tables() {
   pqxx::work txn(*db);
 
+  /* TODO: interrupting this might have strange consequences (though the transaction should rollback by itself). Maybe the real initialization belongs
+   * somewhere else ? */
+
   try {
+    std::string qCheckType("SELECT 1 FROM pg_type WHERE typname='feed_type'");
+    pqxx::result exist_r = txn.exec(qCheckType);
+    if (exist_r.size() == 0) {
+        std::string qTypeCreate("CREATE TYPE feed_type AS ENUM ('rss', 'tumblr')");
+        txn.exec(qTypeCreate);
+    }
+
     std::string qSources("CREATE TABLE IF NOT EXISTS sources "
-		  "(website_id TEXT PRIMARY KEY, "
-		  "feed_url TEXT NOT NULL UNIQUE, "
+          "(uid SERIAL PRIMARY KEY, "  
+          "type FEED_TYPE NOT NULL, "
+		  /*"website_id TEXT NOT NULL, "*/
+		  "feed_url TEXT NOT NULL, "
 		  "title TEXT NOT NULL, "
 		  "url TEXT NOT NULL, "
 		  "descr TEXT NOT NULL, "
 		  "etag TEXT, "
-		  "lastmodified TEXT)");
+		  "lastmodified TEXT, "
+          "UNIQUE (type, feed_url))");
     txn.exec(qSources);
 
     std::string qPosts("CREATE TABLE IF NOT EXISTS posts "
 		  "(uid SERIAL PRIMARY KEY, "
-		  "website_id TEXT REFERENCES sources (website_id), "
+		  "source_id INTEGER REFERENCES sources (uid), "
 		  "id TEXT NOT NULL, "
 		  "title TEXT NOT NULL, "
 		  "link TEXT NOT NULL, "
 		  "date TIMESTAMP NOT NULL, "
 		  "description TEXT NOT NULL, "
-		  "UNIQUE (website_id, id))");
+		  "UNIQUE (source_id, id))");
     txn.exec(qPosts);
 
     std::string qUsers("CREATE TABLE IF NOT EXISTS users "
@@ -57,25 +70,25 @@ PostgresDB::init_tables() {
     txn.exec(qUsers);
 
     std::string qReads("CREATE TABLE IF NOT EXISTS readeds "
-		  "(\"user\" TEXT REFERENCES users (login), "
+		  "(\"user\" INTEGER REFERENCES users (uid), "
 		  "post_id INTEGER REFERENCES posts (uid), "
 		  "PRIMARY KEY (\"user\", post_id))");
     txn.exec(qReads);
 
     std::string qSubscriptions("CREATE TABLE IF NOT EXISTS subscriptions "
-		  "(\"user\" TEXT REFERENCES users (login), "
-		  "sources_id TEXT REFERENCES sources (website_id), "
+		  "(\"user\" INTEGER REFERENCES users (uid), "
+		  "sources_id INTEGER REFERENCES sources (uid), "
 		  "PRIMARY KEY (\"user\", sources_id))");
     txn.exec(qSubscriptions);
 
     std::string qFavorites("CREATE TABLE IF NOT EXISTS favorites "
-		  "(\"user\" TEXT REFERENCES users (login), "
+		  "(\"user\" INTEGER REFERENCES users (uid), "
 		  "post_id INTEGER REFERENCES posts (uid), "
   		  "PRIMARY KEY (\"user\", post_id))");
     txn.exec(qFavorites);
 
     std::string qDisabled("CREATE TABLE IF NOT EXISTS disabled "
-            "(sources_id TEXT REFERENCES sources (website_id), "
+            "(sources_id INTEGER REFERENCES sources (uid), "
             "PRIMARY KEY (sources_id))");
     txn.exec(qDisabled);
 
@@ -89,8 +102,8 @@ PostgresDB::init_tables() {
 
 }
 
-std::string
-PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std::string &title, std::string &url, std::string &descr, std::string&, std::string&, std::string&, std::string &user, std::string &etag, std::string &lastmodified) {
+int
+PostgresDB::create_feed_full(const feed& feed, const std::string& user) {
 
   /* We have to do two things:
    * - create the feed, if we don't already have it.
@@ -99,45 +112,59 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
 
   pqxx::work txn(*db);
   
-  std::string uid = "";
+  int uid = -1;
 
   try {
 
-    std::string exist_query("SELECT website_id "
+    std::string exist_query("SELECT uid "
 		  "FROM sources "
-		  "WHERE feed_url=" + txn.quote(feed_url));
+		  "WHERE feed_url=" + txn.quote(feed.feed_url));
 
     pqxx::result exist_r = txn.exec(exist_query);
 
     if(exist_r.size() == 0) {
 
+      std::string type = "";
+      if (feed.type == FEED_RSS) {
+          type = "rss";
+      } else if (feed.type == FEED_TUMBLR) {
+          type = "tumblr";
+      }
+
       std::string insert_query("INSERT INTO sources "
-		  "(website_id, feed_url, title, url, descr, etag, lastmodified) VALUES ("
-		  + txn.quote(website_id) + ","
-		  + txn.quote(feed_url) + ","
-		  + txn.quote(title) + ","
-		  + txn.quote(url) + ","
-		  + txn.quote(descr) + ","
-		  + txn.quote(etag) + ","
-		  + txn.quote(lastmodified) + ")"
+		  "(type, feed_url, title, url, descr, etag, lastmodified) VALUES ("
+		  + txn.quote(type) + ","
+		  + txn.quote(feed.feed_url) + ","
+		  + txn.quote(feed.title) + ","
+		  + txn.quote(feed.url) + ","
+		  + txn.quote(feed.descr) + ","
+		  + txn.quote(feed.etag) + ","
+		  + txn.quote(feed.lastmodified) + ")"
 	  );
       txn.exec(insert_query);
 
-      uid = website_id;
-    } else {
-      uid = exist_r[0][0].as<std::string>();
+      exist_r = txn.exec(exist_query);
+
+      if (exist_r.size() == 0) {
+          std::cerr << "Feed insertion silently failed. That's weird. Exiting." << std::endl;
+          exit(-1);
+      }
     }
 
+    uid = exist_r[0][0].as<int>();
+
     std::string subscr_query("INSERT INTO subscriptions "
-		    "(\"user\", sources_id) VALUES "
-		    "(" + txn.quote(user) + "," + txn.quote(uid)
-		    + ")");
+		    "(\"user\", sources_id) "
+		    "(SELECT uid, " + txn.quote(uid) + " FROM users WHERE login=" + txn.quote(user) + " LIMIT 1)");
     txn.exec(subscr_query);
+
+    /* TODO: the "User doesn't exist" case will silently fail. Fix that. */
 
     txn.commit();
 
   } catch (pqxx::unique_violation const& exc) {
-    /* This only means that the sources is already there. */
+    /* This only means that the source is already there. */
+    uid = -1;
 //    std::cerr << "Note: source already present in database." << std::endl;
   } catch (pqxx::pqxx_exception const& exc) {
     std::cerr << "Exception while creating feed !" << std::endl;
@@ -149,6 +176,30 @@ PostgresDB::create_feed_full(std::string &website_id, std::string &feed_url, std
 
 }
 
+struct feed *
+PostgresDB::feed_from_pqxxresult(pqxx::result r, int k) {
+      struct feed * f = new struct feed;
+      f->uid = r[k]["uid"].as<int>();
+
+      std::string feed_type(r[k]["type"].as<std::string>());
+      if (feed_type == "rss") {
+          f->type = FEED_RSS;
+      } else if (feed_type == "tumblr") {
+          f->type = FEED_TUMBLR;
+      } else {
+          f->type = FEED_UNK;
+      }
+
+      f->feed_url = r[k]["feed_url"].as<std::string>();
+      f->title = r[k]["title"].as<std::string>();
+      f->url = r[k]["url"].as<std::string>();
+      f->descr = r[k]["descr"].as<std::string>();
+      f->etag = r[k]["etag"].as<std::string>();
+      f->lastmodified = r[k]["lastmodified"].as<std::string>();
+
+      return f;
+}
+
 std::list<struct feed *> * 
 PostgresDB::get_feeds() {
   pqxx::work txn(*db);
@@ -157,19 +208,14 @@ PostgresDB::get_feeds() {
 
   try {
     pqxx::result r = txn.exec(
-		  "SELECT website_id, feed_url, title, etag, lastmodified FROM sources WHERE website_id NOT IN (SELECT sources_id FROM disabled)");
+		  "SELECT uid, type, feed_url, title, url, descr, etag, lastmodified FROM sources WHERE uid NOT IN (SELECT sources_id FROM disabled)");
     txn.commit();
 
     std::cout << r.size() << " feeds found in database." << std::endl;
 
     for(pqxx::result::size_type i = 0; i < r.size(); ++i) {
-      struct feed * f = new struct feed;
-      f->id = r[i]["website_id"].as<std::string>();
-      f->feed_url = r[i]["feed_url"].as<std::string>();
-      f->title = r[i]["title"].as<std::string>();
-      f->etag = r[i]["etag"].as<std::string>();
-      f->lastmodified = r[i]["lastmodified"].as<std::string>();
-      externalL->push_back(f);
+      
+      externalL->push_back(feed_from_pqxxresult(r,i));
     }
 
   } catch (pqxx::pqxx_exception const& exc) {
@@ -182,12 +228,12 @@ PostgresDB::get_feeds() {
 }
 
 struct feed *
-PostgresDB::get_feed_by_id(std::string &id) {
+PostgresDB::get_feed_by_id(int id) {
   pqxx::work txn(*db);
 
   try {
     pqxx::result r = txn.exec(
-          "SELECT website_id, feed_url, title, etag, lastmodified FROM sources WHERE website_id = "   
+          "SELECT uid, type, feed_url, title, url, descr, etag, lastmodified FROM sources WHERE uid= "   
           + txn.quote(id));
     txn.commit();
 
@@ -198,16 +244,9 @@ PostgresDB::get_feed_by_id(std::string &id) {
     } else {
         if (r.size() > 1) {
         // Multiple matches
-        std::cout << "More than one match for id " << id << ". This shouldn't happen.";
+        std::cout << "Warning: more than one match for id " << id << ". This shouldn't happen.";
         }
-        struct feed * f = new struct feed;
-        f->id = r[0]["website_id"].as<std::string>();
-        f->feed_url = r[0]["feed_url"].as<std::string>();
-        f->title = r[0]["title"].as<std::string>();
-        f->etag = r[0]["etag"].as<std::string>();
-        f->lastmodified = r[0]["lastmodified"].as<std::string>();
-
-        return f;
+        return feed_from_pqxxresult(r,0);
     }
   } catch (pqxx::pqxx_exception const& exc) {
     std::cerr << "Exception while getting a feed !" << std::endl;
@@ -219,13 +258,13 @@ PostgresDB::get_feed_by_id(std::string &id) {
 
 
 void
-PostgresDB::update_timestamps_feed(std::string &website_id, std::string &etag, std::string &lastmodified) {
+PostgresDB::update_timestamps_feed(int uid, std::string &etag, std::string &lastmodified) {
   pqxx::work txn(*db);
 
   std::string query("UPDATE sources SET "
 		  "etag=" + txn.quote(etag) + ", "
 		  "lastmodified=" + txn.quote(lastmodified) + " "
-		  "WHERE website_id=" + txn.quote(website_id));
+		  "WHERE uid=" + txn.quote(uid));
 
   try {
     txn.exec(query);
@@ -239,13 +278,13 @@ PostgresDB::update_timestamps_feed(std::string &website_id, std::string &etag, s
 }
 
 void
-PostgresDB::update_metadata_feed(std::string &website_id, std::string &title, std::string &url, std::string &descr, std::string&, std::string&, std::string&) {
+PostgresDB::update_metadata_feed(int uid, std::string &title, std::string &url, std::string &descr, std::string&, std::string&, std::string&) {
   pqxx::work txn(*db);
   std::string query("UPDATE sources SET "
 		  "title=" + txn.quote(title) + ", "
 		  "url=" + txn.quote(url) + ", "
 		  "descr=" + txn.quote(descr) + " "
-		  "WHERE website_id=" + txn.quote(website_id));
+		  "WHERE uid=" + txn.quote(uid));
 
   try {
     txn.exec(query);
@@ -259,11 +298,11 @@ PostgresDB::update_metadata_feed(std::string &website_id, std::string &title, st
 }
 
 void
-PostgresDB::update_feed_url(std::string &website_id, std::string &feed_url) {
+PostgresDB::update_feed_url(int uid, std::string &feed_url) {
   pqxx::work txn(*db);
   std::string query("UPDATE sources SET "
 		  "feed_url=" + txn.quote(feed_url) + " "
-		  "WHERE website_id=" + txn.quote(website_id));
+		  "WHERE uid=" + txn.quote(uid));
 
   try {
     txn.exec(query);
@@ -276,13 +315,13 @@ PostgresDB::update_feed_url(std::string &website_id, std::string &feed_url) {
 }
 
 void
-PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &title, std::string &link, int date, std::string &descr) {
+PostgresDB::insert_entry(int uid, std::string &id, std::string &title, std::string &link, int date, std::string &descr) {
   pqxx::work txn(*db);
   std::string d = TimeHelpers::getPGREInput(date);
   std::string query("INSERT INTO posts "
-		  "(website_id, id, title, link, date, description) "
+		  "(source_id, id, title, link, date, description) "
 		  "VALUES ("
-		  + txn.quote(website_id) + ", "
+		  + txn.quote(uid) + ", "
 		  + txn.quote(id) + ", "
 		  + txn.quote(title) + ", "
 		  + txn.quote(link) + ", "
@@ -303,20 +342,20 @@ PostgresDB::insert_entry(std::string &website_id, std::string &id, std::string &
 }
 
 std::list<Entry>
-PostgresDB::get_entries(std::string &website_id, int num) {
+PostgresDB::get_entries(int uid, int num) {
   pqxx::work txn(*db);
   std::list<Entry> l;
 
   std::string query("SELECT id, title, link, date, description "
 		  "FROM posts "
-		  "WHERE website_id=" + txn.quote(website_id) + " "
+		  "WHERE source_id=" + txn.quote(uid) + " "
 		  "ORDER BY date DESC LIMIT " + txn.quote(num));
 
   try {
     pqxx::result r = txn.exec(query);
     txn.commit();
 
-    std::cout << r.size() << " entries found for feed " << website_id << std::endl;
+    std::cout << r.size() << " entries found for feed " << uid << std::endl;
 
     for (pqxx::result::size_type i = 0; i < r.size(); ++i) {
       std::string date = r[i][3].as<std::string>();
@@ -330,7 +369,7 @@ PostgresDB::get_entries(std::string &website_id, int num) {
       l.push_back(e);
     }
   } catch (pqxx::pqxx_exception const& exc) {
-    std::cerr << "Exception while getting entries for " << website_id << std::endl;
+    std::cerr << "Exception while getting entries for " << uid << std::endl;
     std::cerr << exc.base().what() << std::endl;
     exit(-1);
   }

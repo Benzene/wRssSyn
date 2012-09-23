@@ -15,7 +15,7 @@ RssParser::RssParser() :
 {
 }
 
-RssParser::RssParser(AbstractDB * db, std::string id) :
+RssParser::RssParser(AbstractDB * db, int id) :
   GenericParser(db, id)
 {
 }
