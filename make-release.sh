@@ -2,6 +2,7 @@
 
 # Creates a tarball for releasing
 # Don't forget to set target=Release in CMakeLists.txt beforehand
+# You also need to set PORTVERSION to the expected value in the port Makefile
 
 if [ "$#" -lt 1 ]; then
     exit 1
